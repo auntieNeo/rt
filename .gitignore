@@ -1,0 +1,8 @@
+# VIM specific files
+*.swo
+*.swp
+
+# Generated files
+/build
+CMakeCache.txt
+CMakeFiles
