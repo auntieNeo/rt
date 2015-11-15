@@ -7,7 +7,9 @@ namespace rt { namespace render {
   /**
    * Debug routine used to display a pixel sample distribution with SDL.
    */
-  void displaySampleDistribution(const PixelSampleDistribution &dist);
+  void displaySampleDistribution(
+      const PixelSampleDistribution &dist,
+      const char *title);
 } }
 
 #endif

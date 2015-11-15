@@ -10,15 +10,23 @@ namespace rt { namespace render {
   const int WINDOW_WIDTH = 500;
   const int WINDOW_HEIGHT = WINDOW_WIDTH;
 
-  void displaySampleDistribution(const PixelSampleDistribution &dist) {
+  void displaySampleDistribution(
+      const PixelSampleDistribution &dist,
+      const char *title)
+  {
     SDL_Window *window;
     SDL_Renderer *renderer;
 
     // Make an SDL window and rendering context
-    SDL_CreateWindowAndRenderer(
-        WINDOW_WIDTH, WINDOW_HEIGHT,  // Window dimensions
-        0,  // Window flags
-        &window, &renderer);
+    window = SDL_CreateWindow(
+        title,
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        WINDOW_WIDTH, WINDOW_HEIGHT,
+        0);
+    renderer = SDL_CreateRenderer(
+        window,
+        -1,
+        SDL_RENDERER_SOFTWARE);
 
     // Clear the render window to black
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
