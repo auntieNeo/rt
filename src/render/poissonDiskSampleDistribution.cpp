@@ -49,9 +49,9 @@ namespace rt { namespace render {
     activeList.push_back(m_samples.size() - 1);
     int i_initial = floor(initialSample.x * grid_size);
     int j_initial = floor(initialSample.y * grid_size);
-    assert(i_initial > 0);
+    assert(i_initial >= 0);
     assert(i_initial < grid_size);
-    assert(j_initial > 0);
+    assert(j_initial >= 0);
     assert(j_initial < grid_size);
     grid.at(i_initial + j_initial * grid_size) = m_samples.size() - 1;
 
