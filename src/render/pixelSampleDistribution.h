@@ -11,7 +11,7 @@ namespace rt { namespace render {
    * This class describes the sample distribution over a single pixel.
    *
    * The PixelSampleDistribution class generates a number of sample locations
-   * over the area of a pixel, from -1.0 to 1.0 in both dimensions. The samples
+   * over the area of a pixel, from 0.0 to 1.0 in both dimensions. The samples
    * might also be somewhat past the pixel boundries.
    *
    * The PixelSampleDistribution class is intended to be instantiated by a
@@ -30,7 +30,7 @@ namespace rt { namespace render {
        *
        * Implementing classes must generate a list of sample locations and
        * return them with this method. The each sample location should
-       * generally be within the -1.0 to 1.0 boundries of a pixel, but they may
+       * generally be within the 0.0 to 1.0 boundries of a pixel, but they may
        * go slightly beyond those boundries.
        */
       virtual std::vector<glm::vec2> getSamples() const = 0;

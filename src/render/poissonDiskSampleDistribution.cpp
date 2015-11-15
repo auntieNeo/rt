@@ -33,16 +33,17 @@ namespace rt { namespace render {
     // The cell_size ensures that each grid cell contains no more than one
     // sample
     double cell_size = r / sqrt(2);
-    int grid_size = ceil(2.0f / cell_size);
-    cell_size = 2.0f / double(grid_size);
+    int grid_size = ceil(1.0f / cell_size);
+    cell_size = 1.0f / double(grid_size);
     // The value -1 in the grid indicates no sample in the cell
     std::vector<int> grid(grid_size*grid_size, -1);
 
     // Step 1: Select an initial sample at random from the domain and
     // initialize the "active list"
     glm::vec2 initialSample(
-        (dist(gen) * 2.0) - 1.0,
-        (dist(gen) * 2.0) - 1.0);
+        dist(gen),  // x
+        dist(gen)   // y
+        );
     m_samples.push_back(initialSample);
     std::vector<int> activeList;
     activeList.push_back(0);
@@ -67,8 +68,8 @@ namespace rt { namespace render {
             activeSample.x + r_0 * cos(theta),
             activeSample.y + r_0 * sin(theta));
         // Determine the cell in the grid that contains the new sample
-        int i_new = floor((newSample.x + 1.0) / 2.0 * grid_size);
-        int j_new = floor((newSample.y + 1.0) / 2.0 * grid_size);
+        int i_new = floor(newSample.x * grid_size);
+        int j_new = floor(newSample.y * grid_size);
         if ((i_new < 0) || (i_new >= grid_size) ||
             (j_new < 0) || (j_new >= grid_size))
           continue;  // Discard new samples outside of the grid

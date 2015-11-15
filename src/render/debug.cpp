@@ -39,8 +39,8 @@ namespace rt { namespace render {
       fprintf(stderr, "x: %f, y: %f\n", sample.x, sample.y);
       // Draw a cross for each sample in the pixel
       SDL_RenderDrawPoint(renderer,
-          (sample.x + 1.0) / 2.0 * WINDOW_WIDTH,
-          (sample.y + 1.0) / 2.0 * WINDOW_HEIGHT);
+          sample.x * WINDOW_WIDTH,
+          sample.y * WINDOW_HEIGHT);
     }
 
     // Update the front buffer
