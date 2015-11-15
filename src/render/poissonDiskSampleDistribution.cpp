@@ -38,15 +38,22 @@ namespace rt { namespace render {
     // The value -1 in the grid indicates no sample in the cell
     std::vector<int> grid(grid_size*grid_size, -1);
 
-    // Step 1: Select an initial sample at random from the domain and
-    // initialize the "active list"
+    // Step 1: Select an initial sample at random from the domain, initialize
+    // the "active list", and add the initial sample to the grid
     glm::vec2 initialSample(
         dist(gen),  // x
         dist(gen)   // y
         );
     m_samples.push_back(initialSample);
     std::vector<int> activeList;
-    activeList.push_back(0);
+    activeList.push_back(m_samples.size() - 1);
+    int i_initial = floor(initialSample.x * grid_size);
+    int j_initial = floor(initialSample.y * grid_size);
+    assert(i_initial > 0);
+    assert(i_initial < grid_size);
+    assert(j_initial > 0);
+    assert(j_initial < grid_size);
+    grid.at(i_initial + j_initial * grid_size) = m_samples.size() - 1;
 
     // Step 2: Look for samples around each sample in the active list with a
     // "dartboard" method, removing samples from the active list when we can
