@@ -12,6 +12,9 @@ namespace rt { namespace render {
    * "Game Programming Gems 4".
    */
   class PoissonDiskSampleDistribution : public PixelSampleDistribution {
+    private:
+      std::vector<glm::vec2> m_samples;
+
     public:
       /**
        * Constructs a poisson disk sample distribution without specifying the
@@ -19,7 +22,7 @@ namespace rt { namespace render {
        *
        * \a d is the minimum distance between samples.
        */
-      PoissonDiskSampleDistribution(float d = 0.1f);
+      PoissonDiskSampleDistribution(double r = 0.1f);
 
       /**
        * Destructor for poisson disk sample distribution objects.
@@ -31,6 +34,9 @@ namespace rt { namespace render {
        * sample locations for the poisson-disk sample distribution.
        */
       std::vector<glm::vec2> getSamples() const;
+
+    private:
+      void m_generateSamples(double r);
   };
 } }
 
