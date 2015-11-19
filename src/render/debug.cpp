@@ -49,7 +49,7 @@ namespace rt { namespace render {
     // Wait for the user to close the window
     SDL_Event event;
     bool quit = false;
-    while ((SDL_WaitEvent(&event) >= 0) && !quit) {
+    while (!quit && (SDL_WaitEvent(&event) >= 0)) {
       switch (event.type) {
         case SDL_QUIT:
           quit = true;

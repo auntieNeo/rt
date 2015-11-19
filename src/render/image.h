@@ -21,6 +21,8 @@ namespace rt { namespace render {
       int width() const { return m_width; }
       int height() const { return m_height; }
 
+      glm::dvec2 dimensions() { return glm::dvec2(m_width, m_height); }
+
       glm::dvec3 *pixelData(int x, int y);
   };
 

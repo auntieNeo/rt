@@ -1,14 +1,10 @@
 add_library(render STATIC
     debug.cpp
     image.cpp
-    nullPixelListener.cpp
-    nullRayListener.cpp
-    nullSampleListener.cpp
-    nullSubimageListener.cpp
     pixel.cpp
     pixelSampleDistribution.cpp
     poissonDiskSampleDistribution.cpp
-    renderer.cpp
+    previewWindow.cpp
     sample.cpp
     simpleHaltingStrategy.cpp
     simpleSampleDistribution.cpp

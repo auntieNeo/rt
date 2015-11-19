@@ -17,11 +17,7 @@
 #include "render/simpleSampleDistributionDistribution.h"
 #include "render/simpleSampleDistribution.h"
 #include "render/simpleHaltingStrategy.h"
-#include "render/debugStrategy.h"
-#include "render/nullSubimageListener.h"
-#include "render/nullPixelListener.h"
-#include "render/nullSampleListener.h"
-#include "render/nullRayListener.h"
+#include "render/previewWindowDebugStrategy.h"
 
 int main(int argc, char **argv) {
   rt::scene::Scene scene;
@@ -53,11 +49,13 @@ int main(int argc, char **argv) {
       // Halt after taking each sample once
       rt::render::SimpleHaltingStrategy
     >,
-    rt::render::DebugStrategy<
-      rt::render::NullSubimageListener,
-      rt::render::NullPixelListener,
-      rt::render::NullSampleListener,
-      rt::render::NullRayListener
+    rt::render::PreviewWindowDebugStrategy<
+      rt::render::PreviewWindowImageListener,
+      rt::render::PreviewWindowNullPassListener,
+      rt::render::PreviewWindowNullSubimageListener,
+      rt::render::PreviewWindowPixelListener,
+      rt::render::PreviewWindowNullSampleListener,
+      rt::render::PreviewWindowNullRayListener
     >
   > simpleRenderer;
   simpleRenderer.renderScene(scene);
