@@ -4,6 +4,7 @@
 #include "render/debug.h"
 #include "render/poissonDiskSampleDistribution.h"
 
+#include "scene/perspectiveCamera.h"
 #include "scene/scene.h"
 #include "scene/sphere.h"
 
@@ -27,8 +28,17 @@ int main(int argc, char **argv) {
         1.0,  // 1m radius
         glm::dvec4(0.0, 0.0, 0.0, 1.0)  // Positioned at the origin
         ));
-
   scene.addObject(std::move(sphere));
+
+  rt::scene::PerspectiveCamera camera(
+        1.0,     // fovy
+        0.01,    // near
+        1000.0,  // far
+        glm::dvec4(0.0, 0.0, 5.0, 1.0),  // position
+        glm::quat()  // orientation
+        );
+  // TODO: Put the camera in the scene
+
 
   /*
   rt::render::Renderer renderer;
@@ -58,7 +68,7 @@ int main(int argc, char **argv) {
       rt::render::PreviewWindowNullRayListener
     >
   > simpleRenderer;
-  simpleRenderer.renderScene(scene, 100, 100);
+  simpleRenderer.renderScene(scene, camera, 100, 100);
 
   /*
   rt::render::Renderer<

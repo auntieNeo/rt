@@ -1,6 +1,8 @@
 #ifndef RT_RENDER_PREVIEW_WINDOW_DEBUG_STRATEGY_H_
 #define RT_RENDER_PREVIEW_WINDOW_DEBUG_STRATEGY_H_
 
+#include <algorithm>
+
 #include "previewWindow.h"
 
 namespace rt { namespace render {
@@ -77,9 +79,9 @@ namespace rt { namespace render {
       void endPixel(const Pixel &pixel) {
         m_previewWindow->drawPixel(
             pixel.x(), -(pixel.y()) + m_previewWindow->height() - 1,
-            int(pixel.r() * 255.0),
-            int(pixel.g() * 255.0),
-            int(pixel.b() * 255.0));
+            int(std::max(pixel.r(), 0.0) * 255.0),
+            int(std::max(pixel.g(), 0.0) * 255.0),
+            int(std::max(pixel.b(), 0.0) * 255.0));
       }
   };
 

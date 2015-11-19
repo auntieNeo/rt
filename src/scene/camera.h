@@ -9,7 +9,7 @@ namespace rt { namespace scene {
       Camera(glm::dvec4 position, glm::dquat orientation);
       virtual ~Camera();
 
-      virtual glm::dmat4 projection() const = 0;
+      virtual glm::dmat4 projection(double aspect) const = 0;
   };
 } }
 

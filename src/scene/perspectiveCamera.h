@@ -6,14 +6,14 @@
 namespace rt { namespace scene {
   class PerspectiveCamera : public Camera {
     private:
-      double m_fovy, m_aspect, m_near, m_far;
+      double m_fovy, m_near, m_far;
     public:
       PerspectiveCamera(
-          double fovy, double aspect, double near, double far,
+          double fovy, double near, double far,
           glm::dvec4 position, glm::dquat orientation);
       ~PerspectiveCamera();
 
-      glm::dmat4 projection() const;
+      glm::dmat4 projection(double aspect) const;
   };
 } }
 
