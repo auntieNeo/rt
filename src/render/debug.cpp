@@ -37,7 +37,7 @@ namespace rt { namespace render {
     for (glm::vec2 sample : dist.getSamples()) {
       // Print out the sample location for debugging
       fprintf(stderr, "x: %f, y: %f\n", sample.x, sample.y);
-      // Draw a cross for each sample in the pixel
+      // Draw a point for each sample in the pixel
       SDL_RenderDrawPoint(renderer,
           sample.x * WINDOW_WIDTH,
           sample.y * WINDOW_HEIGHT);

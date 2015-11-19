@@ -34,6 +34,7 @@ namespace rt { namespace render {
        * go slightly beyond those boundries.
        */
       virtual std::vector<glm::vec2> getSamples() const = 0;
+
   };
 
   typedef std::shared_ptr<PixelSampleDistribution> PixelSampleDistributionPtr;
