@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
       rt::render::PreviewWindowNullRayListener
     >
   > simpleRenderer;
-  simpleRenderer.renderScene(scene);
+  simpleRenderer.renderScene(scene, 100, 100);
 
   /*
   rt::render::Renderer<
@@ -89,6 +89,7 @@ int main(int argc, char **argv) {
 
   double radii[] = { 0.3, 0.1, 0.05, 0.01, 0.005 };
   for (double r : radii) {
+    break;  // XXX
     rt::render::PixelSampleDistributionPtr dist(
         new rt::render::PoissonDiskSampleDistribution(r));
     const size_t TITLE_SIZE = 256;

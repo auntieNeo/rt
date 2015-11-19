@@ -58,8 +58,9 @@ namespace rt {
 
               // TODO: Cast a ray through this sample
 
+              glm::dvec2 pos = pixel.position() / image->dimensions();
               // TODO: Add the sample's contribution to the pixel
-              pixel.value() = glm::vec3(0.0, 1.0, 0.0);
+              pixel.value() = glm::vec3(pos[0], pos[1], 0.0);
               debugStrategy.endSample(sample);
             }
             debugStrategy.endPixel(pixel);

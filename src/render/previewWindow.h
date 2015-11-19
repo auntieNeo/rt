@@ -10,9 +10,13 @@ namespace rt { namespace render {
     private:
       SDL_Window *m_window;
       SDL_Renderer *m_renderer;
+      int m_width, m_height;
     public:
       PreviewWindow();
       ~PreviewWindow();
+
+      int width() const { return m_width; }
+      int height() const { return m_height; }
 
       void openWindow(int width, int height);
       void waitForCloseWindow();

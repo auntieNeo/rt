@@ -76,7 +76,7 @@ namespace rt { namespace render {
       void startPixel(const Pixel &pixel) {}
       void endPixel(const Pixel &pixel) {
         m_previewWindow->drawPixel(
-            pixel.x(), pixel.y(),
+            pixel.x(), -(pixel.y()) + m_previewWindow->height() - 1,
             int(pixel.r() * 255.0),
             int(pixel.g() * 255.0),
             int(pixel.b() * 255.0));

@@ -2,7 +2,7 @@
 
 namespace rt { namespace render {
   PreviewWindow::PreviewWindow()
-    : m_window(nullptr), m_renderer(nullptr)
+    : m_window(nullptr), m_renderer(nullptr), m_width(0), m_height(0)
   {
   }
 
@@ -10,6 +10,9 @@ namespace rt { namespace render {
   }
 
   void PreviewWindow::openWindow(int width, int height) {
+    m_width = width;
+    m_height = height;
+
     m_window = SDL_CreateWindow(
         "Render Preview",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
