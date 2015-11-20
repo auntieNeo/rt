@@ -17,7 +17,7 @@ namespace rt { namespace scene {
   /**
    * Calculates the ray-sphere intersection using the quadratic equation.
    */
-  double Sphere::intersect(const Ray &ray) const {
+  double Sphere::intersect(const Ray &ray, glm::dvec4 &normal) const {
     double a = glm::dot(ray.direction(), ray.direction());
     double b = 2.0 * glm::dot(ray.direction(), ray.origin() - this->position());
     float c = glm::dot(ray.origin() - this->position(),
@@ -31,6 +31,14 @@ namespace rt { namespace scene {
     double t_0 = (-b + sqrt(d)) / (2.0 * a);
     double t_1 = (-b - sqrt(d)) / (2.0 * a);
 
-    return t_0 < t_1 ? std::max(t_0, 0.0) : std::max(t_1, 0.0);
+    double t = t_0 < t_1 ? std::max(t_0, 0.0) : std::max(t_1, 0.0);
+
+    if (t == 0.0)
+      return 0.0;  // Sphere is behind or inside of the ray
+
+    // Compute and return the normal
+    normal = glm::normalize(ray.point(t) - this->position());
+
+    return t;
   }
 } }

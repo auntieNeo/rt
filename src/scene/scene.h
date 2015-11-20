@@ -1,6 +1,8 @@
 #ifndef RT_SCENE_SCENE_H_
 #define RT_SCENE_SCENE_H_
 
+#include <glm/glm.hpp>
+
 #include "../ray.h"
 #include "sceneObject.h"
 
@@ -17,7 +19,7 @@ namespace rt { namespace scene {
 
       // TODO: Add to the intersect interface. Some things that we need are
       // material properties, normal, object, etc.
-      double intersect(const Ray &ray) const;
+      double intersect(const Ray &ray, glm::dvec4 &normal) const;
   };
 } }
 

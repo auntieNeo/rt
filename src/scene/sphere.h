@@ -16,7 +16,7 @@ namespace rt { namespace scene {
 
       double radius() const { return m_radius; }
 
-      virtual double intersect(const Ray &ray) const;
+      virtual double intersect(const Ray &ray, glm::dvec4 &normal) const;
   };
 } }
 

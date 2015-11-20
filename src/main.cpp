@@ -25,13 +25,13 @@ int main(int argc, char **argv) {
 
   std::unique_ptr<rt::scene::Sphere> sphere(
       new rt::scene::Sphere(
-        4.0,  // radius
-        glm::dvec4(0.0, 0.0, 0.0, 1.0)  // Positioned at the origin
+        8.0,  // radius
+        glm::dvec4(0.0, 0.0, -40.0, 1.0)  // position
         ));
   scene.addObject(std::move(sphere));
 
   rt::scene::PerspectiveCamera camera(
-        1.0,     // fovy
+        0.5,     // fovy
         0.01,    // near
         1000.0,  // far
         glm::dvec4(0.0, 0.0, 5.0, 1.0),  // position

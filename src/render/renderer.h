@@ -43,7 +43,7 @@ namespace rt {
       size_t sampleCount = 0;
 
 
-      glm::mat4 invProj = camera.projection(double(width) / double(height));
+      glm::mat4 invProj = glm::inverse(camera.projection(double(width) / double(height)));
 
       // Loop until the sample strategy determines that we should stop
       while (!sampleStrategy.checkHaltCondition(image, passCount, sampleCount)) {
@@ -67,13 +67,19 @@ namespace rt {
               // FIXME: Use the sample position and not the camera position
               Ray ray(camera.position(), direction);
               // TODO: Cast a ray through this sample
-              double t = scene.intersect(ray);
+              glm::dvec4 normal;
+              double t = scene.intersect(ray, normal);
+              if (t != DBL_MAX)
+                pixel.value() = glm::dvec3(normal);
+              else
+                pixel.value() = glm::dvec3(0.0, 0.0, 0.0);
 //              pixel.value() = glm::dvec3(direction);
-              if (t < DBL_MAX) {
+/*              if (t < DBL_MAX) {
                 pixel.value() = glm::dvec3(1.0, 1.0, 0.0);
               } else {
                 pixel.value() = glm::dvec3(0.0, 0.0, 1.0);
               }
+              */
 
               // TODO: Add the sample's contribution to the pixel
 //              pixel.value() = glm::dvec3(direction);

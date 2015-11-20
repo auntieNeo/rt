@@ -14,6 +14,8 @@ namespace rt {
 
       glm::dvec4 origin() const { return m_origin; }
       glm::dvec4 direction() const { return m_direction; }
+
+      glm::dvec4 point(double t) const { return this->origin() + t * this->direction(); }
   };
 }
 
