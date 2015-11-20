@@ -23,15 +23,21 @@
 int main(int argc, char **argv) {
   rt::scene::Scene scene;
 
-  std::unique_ptr<rt::scene::Sphere> sphere(
-      new rt::scene::Sphere(
-        8.0,  // radius
-        glm::dvec4(0.0, 0.0, -40.0, 1.0)  // position
-        ));
-  scene.addObject(std::move(sphere));
+  const int NUM_SPHERES = 3;
+
+  for (int i = 0; i < NUM_SPHERES; ++i) {
+    double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
+    pos *= 5.0;
+    std::unique_ptr<rt::scene::Sphere> sphere(
+        new rt::scene::Sphere(
+          8.0,  // radius
+          glm::dvec4(pos, pos, -40.0, 1.0)  // position
+          ));
+    scene.addObject(std::move(sphere));
+  }
 
   rt::scene::PerspectiveCamera camera(
-        0.5,     // fovy
+        0.6,     // fovy
         0.01,    // near
         1000.0,  // far
         glm::dvec4(0.0, 0.0, 5.0, 1.0),  // position

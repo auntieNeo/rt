@@ -15,14 +15,17 @@ namespace rt { namespace scene {
     // FIXME: I would rather loop over m_drawableObjects or something this
     // tight in the main loop
     double least = DBL_MAX;
+    glm::dvec4 leastNormal;
     for (SceneObjectPtr object : m_objects) {
       if (!object->drawable())
         continue;
-      double t = object->intersect(ray, normal);
+      double t = object->intersect(ray, leastNormal);
       if (t <= 0.0)
         continue;
-      if (t < least)
+      if (t < least) {
         least = t;
+        normal = leastNormal;
+      }
     }
     return least;
   }
