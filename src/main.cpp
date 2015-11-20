@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
   std::unique_ptr<rt::scene::Sphere> sphere(
       new rt::scene::Sphere(
-        1.0,  // 1m radius
+        4.0,  // radius
         glm::dvec4(0.0, 0.0, 0.0, 1.0)  // Positioned at the origin
         ));
   scene.addObject(std::move(sphere));

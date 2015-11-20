@@ -67,9 +67,16 @@ namespace rt {
               // FIXME: Use the sample position and not the camera position
               Ray ray(camera.position(), direction);
               // TODO: Cast a ray through this sample
+              double t = scene.intersect(ray);
+//              pixel.value() = glm::dvec3(direction);
+              if (t < DBL_MAX) {
+                pixel.value() = glm::dvec3(1.0, 1.0, 0.0);
+              } else {
+                pixel.value() = glm::dvec3(0.0, 0.0, 1.0);
+              }
 
               // TODO: Add the sample's contribution to the pixel
-              pixel.value() = glm::dvec3(direction);
+//              pixel.value() = glm::dvec3(direction);
               debugStrategy.endSample(sample);
             }
             debugStrategy.endPixel(pixel);

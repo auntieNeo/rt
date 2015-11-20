@@ -19,15 +19,11 @@ namespace rt { namespace scene {
    */
   double Sphere::intersect(const Ray &ray) const {
     double a = glm::dot(ray.direction(), ray.direction());
-    double b = 2 * (
-        glm::dot(ray.origin(), ray.direction()) -
-        glm::dot(this->position(), ray.direction())
-        );
-    double c = glm::dot(ray.origin(), ray.origin()) -
-      2 * glm::dot(this->position(), ray.origin()) -
-      this->radius() * this->radius();
-
-    double d = b*b - 4*a*c;
+    double b = 2.0 * glm::dot(ray.direction(), ray.origin() - this->position());
+    float c = glm::dot(ray.origin() - this->position(),
+                       ray.origin() - this->position())
+              - this->radius() * this->radius();
+    double d = b*b - 4.0*a*c;
 
     if (d <= 0.0)
       return 0.0;  // Non-intersecting or grazing
