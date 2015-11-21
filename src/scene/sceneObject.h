@@ -22,10 +22,6 @@ namespace rt { namespace scene {
       glm::dvec4 position() const { return m_position; }
       glm::dquat orientation() const { return m_orientation; }
 
-      // FIXME: I would rather have only drawable objects define intersect, but
-      // I'm not sure how to handle the polymorphism here.
-      virtual double intersect(const Ray &ray, glm::dvec4 &normal) const { return 0.0; }
-
       virtual bool drawable() const { return false; }
   };
 

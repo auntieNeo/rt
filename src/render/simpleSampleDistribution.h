@@ -14,6 +14,8 @@ namespace rt { namespace render {
       Iterator begin() { return Iterator(0); }
       Iterator end() { return Iterator(1); }
 
+      size_t numSamples() const { return 1; }
+
       class Iterator {
         private:
           int m_index;

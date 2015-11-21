@@ -17,6 +17,7 @@ namespace rt { namespace render {
   template <template<class, class> class SubimageWalker,
             template<class> class PixelWalker,
             template<class> class SampleWalker,
+            class RayWalker,
             template<class> class SampleDistributionDistribution,
             class SampleDistribution,
             class HaltingStrategy>
@@ -44,15 +45,24 @@ namespace rt { namespace render {
       auto sampleWalker(Pixel pixel) {
         return SampleWalker<SampleDistribution>(pixel, m_samples.atPixel(pixel.x(), pixel.y()));
       }
+
+      glm::dvec3 computeRadiance(const Ray &ray, const scene::Scene &scene) {
+        return RayWalker::computeRadiance(ray, scene);
+      }
+
+      size_t numSamples(const Pixel &pixel) {
+        return m_samples.atPixel(pixel.x(), pixel.y()).numSamples();
+      }
   };
 
   template <template<class, class> class SubimageWalker,
             template<class> class PixelWalker,
             template<class> class SampleWalker,
+            class RayWalker,
             template<class> class SampleDistributionDistribution,
             class SampleDistribution,
             class HaltingStrategy>
-  SampleStrategy<SubimageWalker, PixelWalker, SampleWalker,
+  SampleStrategy<SubimageWalker, PixelWalker, SampleWalker, RayWalker,
     SampleDistributionDistribution, SampleDistribution,
     HaltingStrategy>::SampleStrategy(int width, int height)
       : m_samples(width, height)
@@ -62,10 +72,11 @@ namespace rt { namespace render {
   template <template<class, class> class SubimageWalker,
             template<class> class PixelWalker,
             template<class> class SampleWalker,
+            class RayWalker,
             template<class> class SampleDistributionDistribution,
             class SampleDistribution,
             class HaltingStrategy>
-  SampleStrategy<SubimageWalker, PixelWalker, SampleWalker,
+  SampleStrategy<SubimageWalker, PixelWalker, SampleWalker, RayWalker,
     SampleDistributionDistribution, SampleDistribution,
     HaltingStrategy>::~SampleStrategy()
   {

@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "../ray.h"
+#include "../scene/drawableObject.h"
 #include "image.h"
 
 namespace rt {
@@ -53,36 +54,37 @@ namespace rt {
         // Loop through each subimage, assigning each to a thread
         for (auto subimage : sampleStrategy.subimageWalker(image)) {
           debugStrategy.startSubimage(subimage);
+          // TODO: Each subimage needs a new random number generator whose seed
+          // is based on the coordinates of the subimage. This is to preserve
+          // determinism across threads.
           // Loop through each pixel in this subimage
           for (auto pixel : sampleStrategy.pixelWalker(subimage)) {
             debugStrategy.startPixel(pixel);
             // Loop through each sample in this pixel
             for (auto sample : sampleStrategy.sampleWalker(pixel)) {
               debugStrategy.startSample(sample);
-              sampleCount += 1;
               // Find the position of this sample in normalized coordinates
               glm::dvec2 pos = ((pixel.position() + sample.position()) / image->dimensions()) * 2.0 - 1.0;
               // Find the ray direction vector in world space
-              glm::dvec4 direction = glm::dvec4(glm::normalize(glm::dvec3(glm::dvec2(invProj * glm::dvec4(pos, -1.0, 1.0)), -1.0)), 0.0);
+              glm::dvec4 direction =
+                glm::dvec4(
+                  glm::normalize(
+                    glm::dvec3(
+                      glm::dvec2(invProj * glm::dvec4(pos, -1.0, 1.0)),
+                      -1.0)),
+                  0.0);
               // FIXME: Use the sample position and not the camera position
               Ray ray(camera.position(), direction);
-              // TODO: Cast a ray through this sample
-              glm::dvec4 normal;
-              double t = scene.intersect(ray, normal);
-              if (t != DBL_MAX)
-                pixel.value() = glm::dvec3(normal);
-              else
-                pixel.value() = glm::dvec3(0.0, 0.0, 0.0);
-//              pixel.value() = glm::dvec3(direction);
-/*              if (t < DBL_MAX) {
-                pixel.value() = glm::dvec3(1.0, 1.0, 0.0);
-              } else {
-                pixel.value() = glm::dvec3(0.0, 0.0, 1.0);
-              }
-              */
 
-              // TODO: Add the sample's contribution to the pixel
-//              pixel.value() = glm::dvec3(direction);
+              // Walk through the ray tree to compute the radiance for this sample
+              glm::dvec3 sampleRadiance = sampleStrategy.computeRadiance(ray, scene);
+
+              // FIXME: Do I need to clamp the sample radiance value?
+
+              // Add this sample's contribution to the pixel
+              pixel.value() += sampleRadiance / double(sampleStrategy.numSamples(pixel));
+
+              sampleCount += 1;
               debugStrategy.endSample(sample);
             }
             debugStrategy.endPixel(pixel);

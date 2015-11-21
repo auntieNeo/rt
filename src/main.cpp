@@ -15,6 +15,7 @@
 #include "render/simpleSubimageWalker.h"
 #include "render/simplePixelWalker.h"
 #include "render/simpleSampleWalker.h"
+#include "render/simpleRayWalker.h"
 #include "render/simpleSampleDistributionDistribution.h"
 #include "render/simpleSampleDistribution.h"
 #include "render/simpleHaltingStrategy.h"
@@ -58,6 +59,8 @@ int main(int argc, char **argv) {
       rt::render::SimplePixelWalker,
       // Select each sample in the same order they appear in memory
       rt::render::SimpleSampleWalker,
+      // Simply compute the radiance from the first object hit by each ray
+      rt::render::SimpleRayWalker,
       // Use the same sample distribution for each pixel
       rt::render::SimpleSampleDistributionDistribution,
       // Take a single sample at the center of each pixel
