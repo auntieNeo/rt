@@ -1,4 +1,5 @@
 add_library(common
+    math.cpp
     ray.cpp
     )
 

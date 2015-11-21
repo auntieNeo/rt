@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "materialProperties.h"
 #include "sceneObject.h"
 
 namespace rt {
@@ -10,9 +11,16 @@ namespace rt {
 
   namespace scene {
     class DrawableObject : public SceneObject {
+      private:
+        MaterialPropertiesPtr m_materialProperties;
       public:
-        DrawableObject(glm::dvec4 position, glm::dquat orientation);
+        DrawableObject(MaterialPropertiesPtr materialProperties,
+            glm::dvec4 position, glm::dquat orientation);
         virtual ~DrawableObject();
+
+        glm::dvec3 ambient() const { return m_materialProperties->ambient(); }
+        glm::dvec3 diffuse() const { return m_materialProperties->diffuse(); }
+        glm::dvec3 specular() const { return m_materialProperties->specular(); }
 
         virtual double intersect(const Ray &ray, glm::dvec4 &normal) const = 0;
 

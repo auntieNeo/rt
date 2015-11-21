@@ -7,8 +7,12 @@ add_library(render STATIC
     previewWindow.cpp
     sample.cpp
     simpleHaltingStrategy.cpp
+    simpleRayCaster.cpp
     simpleSampleDistribution.cpp
     subimage.cpp
+    )
+target_link_libraries(render
+    common
     )
 
 set_property(TARGET render PROPERTY CXX_STANDARD 14)

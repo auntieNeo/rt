@@ -4,6 +4,7 @@
 #include "render/debug.h"
 #include "render/poissonDiskSampleDistribution.h"
 
+#include "scene/materialProperties.h"
 #include "scene/perspectiveCamera.h"
 #include "scene/scene.h"
 #include "scene/sphere.h"
@@ -16,6 +17,7 @@
 #include "render/simplePixelWalker.h"
 #include "render/simpleSampleWalker.h"
 #include "render/simpleRayWalker.h"
+#include "render/simpleRayCaster.h"
 #include "render/simpleSampleDistributionDistribution.h"
 #include "render/simpleSampleDistribution.h"
 #include "render/simpleHaltingStrategy.h"
@@ -26,26 +28,39 @@ int main(int argc, char **argv) {
 
   const int NUM_SPHERES = 3;
 
+  rt::scene::MaterialPropertiesPtr redMaterial(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.2, 0.0, 0.0),  // ambient
+        glm::dvec3(0.9, 0.0, 0.0),  // diffuse
+        glm::dvec3(0.9, 0.9, 0.9)));  // specular
+
   for (int i = 0; i < NUM_SPHERES; ++i) {
     double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
     pos *= 5.0;
     std::unique_ptr<rt::scene::Sphere> sphere(
         new rt::scene::Sphere(
           8.0,  // radius
-          glm::dvec4(pos, pos, -40.0, 1.0)  // position
+          redMaterial,
+          glm::dvec4(pos, pos, -40.0 + pos, 1.0)  // position
           ));
     scene.addObject(std::move(sphere));
   }
 
+  std::unique_ptr<rt::scene::PointLight> light(
+      new rt::scene::PointLight(
+        glm::dvec3(1.0, 1.0, 1.0),      // intensity
+        glm::dvec4(0.5, 0.5, -20.0, 1.0)  // position
+        ));
+  scene.addObject(std::move(light));
+
   rt::scene::PerspectiveCamera camera(
-        0.6,     // fovy
+        0.7,     // fovy
         0.01,    // near
         1000.0,  // far
         glm::dvec4(0.0, 0.0, 5.0, 1.0),  // position
         glm::quat()  // orientation
         );
   // TODO: Put the camera in the scene
-
 
   /*
   rt::render::Renderer renderer;
@@ -60,7 +75,7 @@ int main(int argc, char **argv) {
       // Select each sample in the same order they appear in memory
       rt::render::SimpleSampleWalker,
       // Simply compute the radiance from the first object hit by each ray
-      rt::render::SimpleRayWalker,
+      rt::render::SimpleRayCaster,
       // Use the same sample distribution for each pixel
       rt::render::SimpleSampleDistributionDistribution,
       // Take a single sample at the center of each pixel

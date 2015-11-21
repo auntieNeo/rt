@@ -14,6 +14,10 @@ namespace rt { namespace scene {
     if (drawable) {
       m_drawables.push_back(drawable);
     }
+    PointLightPtr pointLight = std::dynamic_pointer_cast<PointLight>(o);
+    if (pointLight) {
+      m_pointLights.push_back(pointLight);
+    }
   }
 
   double Scene::intersect(const Ray &ray, glm::dvec4 &normal, DrawableObjectPtr &object) const {
@@ -32,5 +36,11 @@ namespace rt { namespace scene {
       }
     }
     return least;
+  }
+
+  double Scene::intersect(const Ray &ray) const {
+    glm::dvec4 normal;
+    DrawableObjectPtr object;
+    return this->intersect(ray, normal, object);
   }
 } }

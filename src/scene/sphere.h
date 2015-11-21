@@ -9,7 +9,8 @@ namespace rt { namespace scene {
       double m_radius;
 
     public:
-      Sphere(double radius = 1.0,
+      Sphere(double radius,
+          MaterialPropertiesPtr materialProperties,
           glm::dvec4 position = glm::dvec4(0.0, 0.0, 0.0, 1.0),
           glm::dquat orientation = glm::dquat());
       virtual ~Sphere();

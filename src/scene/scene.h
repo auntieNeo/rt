@@ -5,6 +5,7 @@
 
 #include "../ray.h"
 #include "drawableObject.h"
+#include "pointLight.h"
 #include "sceneObject.h"
 
 namespace rt { namespace scene {
@@ -12,6 +13,7 @@ namespace rt { namespace scene {
     private:
       SceneObjectList m_objects;
       DrawableObjectList m_drawables;
+      PointLightList m_pointLights;
 
     public:
       Scene();
@@ -22,6 +24,9 @@ namespace rt { namespace scene {
       // TODO: Add to the intersect interface. Some things that we need are
       // material properties, normal, object, etc.
       double intersect(const Ray &ray, glm::dvec4 &normal, DrawableObjectPtr &object) const;
+      double intersect(const Ray &ray) const;
+
+      const PointLightList &pointLights() const { return m_pointLights; }
   };
 } }
 

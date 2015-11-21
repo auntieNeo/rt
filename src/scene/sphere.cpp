@@ -5,8 +5,9 @@
 #include "sphere.h"
 
 namespace rt { namespace scene {
-  Sphere::Sphere(double radius, glm::dvec4 position, glm::dquat orientation) :
-    DrawableObject(position, orientation)
+  Sphere::Sphere(double radius, MaterialPropertiesPtr materialProperties,
+      glm::dvec4 position, glm::dquat orientation)
+    : DrawableObject(materialProperties, position, orientation)
   {
     m_radius = radius;
   }
@@ -28,13 +29,15 @@ namespace rt { namespace scene {
     if (d <= 0.0)
       return 0.0;  // Non-intersecting or grazing
 
-    double t_0 = (-b + sqrt(d)) / (2.0 * a);
-    double t_1 = (-b - sqrt(d)) / (2.0 * a);
+    double t_0 = std::max((-b + sqrt(d)) / (2.0 * a), 0.0);
+    double t_1 = std::max((-b - sqrt(d)) / (2.0 * a), 0.0);
 
-    double t = t_0 < t_1 ? std::max(t_0, 0.0) : std::max(t_1, 0.0);
+    double t = t_0 < t_1 ?
+      (t_0 != 0.0 ? t_0 : t_1) :
+      (t_1 != 0.0 ? t_1 : t_0);
 
     if (t == 0.0)
-      return 0.0;  // Sphere is behind or inside of the ray
+      return 0.0;  // Sphere is behind the ray
 
     // Compute and return the normal
     normal = glm::normalize(ray.point(t) - this->position());
