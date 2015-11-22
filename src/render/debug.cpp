@@ -34,13 +34,13 @@ namespace rt { namespace render {
 
     // Draw sample points in green
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    for (glm::vec2 sample : dist.getSamples()) {
+    for (Sample sample : dist.getSamples()) {
       // Print out the sample location for debugging
-      fprintf(stderr, "x: %f, y: %f\n", sample.x, sample.y);
+      fprintf(stderr, "x: %f, y: %f\n", sample.x(), sample.y());
       // Draw a point for each sample in the pixel
       SDL_RenderDrawPoint(renderer,
-          sample.x * WINDOW_WIDTH,
-          sample.y * WINDOW_HEIGHT);
+          sample.x() * WINDOW_WIDTH,
+          sample.y() * WINDOW_HEIGHT);
     }
 
     // Update the front buffer

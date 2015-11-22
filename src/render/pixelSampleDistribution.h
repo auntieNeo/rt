@@ -6,6 +6,8 @@
 
 #include <glm/glm.hpp>
 
+#include "sample.h"
+
 namespace rt { namespace render {
   /**
    * This class describes the sample distribution over a single pixel.
@@ -33,7 +35,7 @@ namespace rt { namespace render {
        * generally be within the 0.0 to 1.0 boundries of a pixel, but they may
        * go slightly beyond those boundries.
        */
-      virtual std::vector<glm::vec2> getSamples() const = 0;
+      virtual std::vector<Sample> getSamples() const = 0;
 
   };
 

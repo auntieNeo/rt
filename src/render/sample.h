@@ -10,6 +10,7 @@ namespace rt { namespace render {
 
     public:
       Sample(double x, double y);
+      Sample(const glm::dvec2 &position);
       ~Sample();
 
       double x() const { return m_position[0]; }

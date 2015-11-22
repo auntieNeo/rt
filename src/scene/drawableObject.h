@@ -18,9 +18,7 @@ namespace rt {
             glm::dvec4 position, glm::dquat orientation);
         virtual ~DrawableObject();
 
-        glm::dvec3 ambient() const { return m_materialProperties->ambient(); }
-        glm::dvec3 diffuse() const { return m_materialProperties->diffuse(); }
-        glm::dvec3 specular() const { return m_materialProperties->specular(); }
+        MaterialPropertiesPtr material() { return m_materialProperties; }
 
         virtual double intersect(const Ray &ray, glm::dvec4 &normal) const = 0;
 

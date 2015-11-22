@@ -6,6 +6,11 @@ namespace rt { namespace render {
   {
   }
 
+  Sample::Sample(const glm::dvec2 &position)
+    : m_position(position)
+  {
+  }
+
   Sample::~Sample() {
   }
 } }

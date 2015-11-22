@@ -2,6 +2,7 @@
 #define RT_RENDER_POISSON_DISK_SAMPLE_DISTRIBUTION_H_
 
 #include "pixelSampleDistribution.h"
+#include "sample.h"
 
 namespace rt { namespace render {
   /**
@@ -13,9 +14,10 @@ namespace rt { namespace render {
    */
   class PoissonDiskSampleDistribution : public PixelSampleDistribution {
     private:
-      std::vector<glm::vec2> m_samples;
-
+      std::vector<Sample> m_samples;
     public:
+      class Iterator;
+
       /**
        * Constructs a poisson disk sample distribution without specifying the
        * random seed.
@@ -33,7 +35,43 @@ namespace rt { namespace render {
        * This class implements the getSamples() method to return the actual
        * sample locations for the poisson-disk sample distribution.
        */
-      std::vector<glm::vec2> getSamples() const;
+      std::vector<Sample> getSamples() const;
+
+      Iterator begin() const {
+        return Iterator(0, &m_samples);
+      }
+
+      Iterator end() const {
+        return Iterator(m_samples.size(), &m_samples);
+      }
+
+      size_t numSamples() const { return m_samples.size(); }
+
+      class Iterator {
+        friend PoissonDiskSampleDistribution;
+        private:
+          const std::vector<Sample> *m_samples;
+          int m_index;
+          Iterator(int index, const std::vector<Sample> *samples);
+        public:
+          ~Iterator();
+
+          Iterator &operator++() {  // prefix
+            m_index += 1;
+          }
+//          Iterator &operator++(int);  // postfix
+
+          bool operator==(const Iterator &other) {
+            return this->m_index == other.m_index;
+          }
+          bool operator!=(const Iterator &other) {
+            return !(*this == other);
+          }
+
+          const Sample &operator*() {
+            return m_samples->at(m_index);
+          }
+      };
 
     private:
       void m_generateSamples(double r);

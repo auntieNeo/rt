@@ -16,7 +16,7 @@ namespace rt { namespace render {
   PoissonDiskSampleDistribution::~PoissonDiskSampleDistribution() {
   }
 
-  std::vector<glm::vec2> PoissonDiskSampleDistribution::getSamples() const {
+  std::vector<Sample> PoissonDiskSampleDistribution::getSamples() const {
     return m_samples;
   }
 
@@ -44,7 +44,7 @@ namespace rt { namespace render {
         dist(gen),  // x
         dist(gen)   // y
         );
-    m_samples.push_back(initialSample);
+    m_samples.push_back(Sample(initialSample));
     std::vector<int> activeList;
     activeList.push_back(m_samples.size() - 1);
     int i_initial = floor(initialSample.x * grid_size);
@@ -61,7 +61,7 @@ namespace rt { namespace render {
     while (!activeList.empty()) {
       // Choose a random sample from the active list
       int i = floor(dist(gen) * activeList.size());
-      glm::vec2 activeSample = m_samples.at(activeList.at(i));
+      glm::vec2 activeSample = m_samples.at(activeList.at(i)).position();
 
       // Generate up to k sample points chosen uniformly from the circular
       // annulus between radius r and 2r around the active sample
@@ -92,7 +92,7 @@ namespace rt { namespace render {
             int neighborSampleIndex = grid.at(i + j * grid_size);
             if (neighborSampleIndex < 0)
               continue;  // Skip empty cells
-            glm::vec2 neighborSample = m_samples.at(neighborSampleIndex);
+            glm::vec2 neighborSample = m_samples.at(neighborSampleIndex).position();
             if (i == i_new && j == j_new) {
               // Samples sharing a cell would necessarily be too close
               assert(glm::length(neighborSample - newSample) < r);
@@ -107,7 +107,7 @@ namespace rt { namespace render {
           continue;  // Look for another position for the new sample
         // We found a suitable sample; add it to the list of samples and add
         // its index to the active list
-        m_samples.push_back(newSample);
+        m_samples.push_back(Sample(newSample));
         activeList.push_back(m_samples.size() - 1);
         grid.at(i_new + j_new * grid_size) = m_samples.size() - 1;
         break;
@@ -118,5 +118,14 @@ namespace rt { namespace render {
         activeList.erase(activeList.begin() + i);
       }
     }
+  }
+
+  PoissonDiskSampleDistribution::Iterator::Iterator(
+      int index, const std::vector<Sample> *samples)
+    : m_index(index), m_samples(samples)
+  {
+  }
+
+  PoissonDiskSampleDistribution::Iterator::~Iterator() {
   }
 } }

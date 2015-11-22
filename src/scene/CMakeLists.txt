@@ -3,6 +3,7 @@ add_library(scene STATIC
     drawableObject.cpp
     materialProperties.cpp
     perspectiveCamera.cpp
+    plane.cpp
     pointLight.cpp
     scene.cpp
     sceneObject.cpp

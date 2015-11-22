@@ -18,11 +18,11 @@ namespace rt { namespace render {
       Ray shadowRay(
           ray.point(t) + math::EPSILON * lightDirection, lightDirection);
       double t_shadowRay = scene.intersect(shadowRay);
+      double lightDistance = glm::length(
+          pointLight->position() - shadowRay.origin());
       if (t_shadowRay < DBL_MAX) {
         // The shadow ray hit something; determine if the object it hit is
         // between us and the light source
-        double lightDistance = glm::length(
-            pointLight->position() - shadowRay.origin());
         double occlusionDistance = glm::length(
             shadowRay.point(t_shadowRay) - shadowRay.origin());
         if (occlusionDistance < lightDistance)
@@ -32,15 +32,35 @@ namespace rt { namespace render {
       localLight += shading(
           ray,
           t,
+          lightDistance,
           normal,
-          *pointLight);
+          *pointLight,
+          *(object->material()));
     }
 
     return localLight;
   }
 
-  glm::dvec3 SimpleRayCaster::shading(const Ray &ray, double t,
-      const glm::dvec4 &normal, scene::PointLight &pointLight) {
-    return glm::dvec3(1.0, 1.0, 1.0);  // TODO
+  glm::dvec3 SimpleRayCaster::shading(const Ray &ray, double t, double r,
+      const glm::dvec4 &normal, scene::PointLight &pointLight,
+      const scene::MaterialProperties &material)
+  {
+    glm::dvec3 result;
+
+    glm::dvec4 lightVector = glm::normalize(pointLight.position() - ray.point(t));
+    glm::dvec4 viewVector = glm::normalize(-ray.direction());
+
+    glm::dvec4 halfVector = glm::normalize(lightVector + viewVector);
+
+    glm::dvec3 reflectivity =
+      material.normalizedDiffuse() +
+      material.normalizedSpecular() *
+      pow(dot(halfVector, normal), material.smoothness());
+
+    glm::dvec3 lightIrradiance = pointLight.intensity() / (r * r);
+    glm::dvec3 irradiance = lightIrradiance * dot(lightVector, normal);
+
+    return reflectivity * irradiance;
+//    return reflectivity;
   }
 } }

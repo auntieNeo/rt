@@ -1,11 +1,15 @@
 #include <cstdlib>
+#include <math.h>
 #include <memory>
+
+#include <glm/gtc/quaternion.hpp>
 
 #include "render/debug.h"
 #include "render/poissonDiskSampleDistribution.h"
 
 #include "scene/materialProperties.h"
 #include "scene/perspectiveCamera.h"
+#include "scene/plane.h"
 #include "scene/scene.h"
 #include "scene/sphere.h"
 
@@ -30,9 +34,18 @@ int main(int argc, char **argv) {
 
   rt::scene::MaterialPropertiesPtr redMaterial(
       new rt::scene::MaterialProperties(
-        glm::dvec3(0.2, 0.0, 0.0),  // ambient
-        glm::dvec3(0.9, 0.0, 0.0),  // diffuse
-        glm::dvec3(0.9, 0.9, 0.9)));  // specular
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.8, 0.1, 0.1),  // diffuse
+        glm::dvec3(0.1, 0.1, 0.1),  // specular
+        600.0  // smoothness
+        ));
+  rt::scene::MaterialPropertiesPtr grayMaterial(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.1, 0.9, 0.1),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0  // smoothness
+        ));
 
   for (int i = 0; i < NUM_SPHERES; ++i) {
     double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
@@ -46,15 +59,22 @@ int main(int argc, char **argv) {
     scene.addObject(std::move(sphere));
   }
 
+  std::unique_ptr<rt::scene::Plane> plane(
+      new rt::scene::Plane(
+        grayMaterial,
+        glm::dvec4(0.0, 0.0, -45.0, 1.0),  // position
+        glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 1.0, 0.0))));  // orientation
+  scene.addObject(std::move(plane));
+
   std::unique_ptr<rt::scene::PointLight> light(
       new rt::scene::PointLight(
-        glm::dvec3(1.0, 1.0, 1.0),      // intensity
-        glm::dvec4(0.5, 0.5, -20.0, 1.0)  // position
+        glm::dvec3(1000.0, 1000.0, 1000.0),      // intensity
+        glm::dvec4(0.5, 10.0, -20.0, 1.0)  // position
         ));
   scene.addObject(std::move(light));
 
   rt::scene::PerspectiveCamera camera(
-        0.7,     // fovy
+        1.1,     // fovy
         0.01,    // near
         1000.0,  // far
         glm::dvec4(0.0, 0.0, 5.0, 1.0),  // position
@@ -78,8 +98,10 @@ int main(int argc, char **argv) {
       rt::render::SimpleRayCaster,
       // Use the same sample distribution for each pixel
       rt::render::SimpleSampleDistributionDistribution,
-      // Take a single sample at the center of each pixel
-      rt::render::SimpleSampleDistribution,
+//      // Take a single sample at the center of each pixel
+//      rt::render::SimpleSampleDistribution,
+      // Take samples in a poisson disk sample distribution at each pixel
+      rt::render::PoissonDiskSampleDistribution,
       // Halt after taking each sample once
       rt::render::SimpleHaltingStrategy
     >,
@@ -132,8 +154,6 @@ int main(int argc, char **argv) {
     title[TITLE_SIZE - 1] = '\0';
     rt::render::displaySampleDistribution(*dist, title);
   }
-
-
 
   return EXIT_SUCCESS;
 }
