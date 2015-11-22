@@ -18,6 +18,7 @@
 #include "render/renderer.h"
 #include "render/sampleStrategy.h"
 #include "render/simpleSubimageWalker.h"
+#include "render/gridSubimageWalker.h"
 #include "render/simplePixelWalker.h"
 #include "render/simpleSampleWalker.h"
 #include "render/simpleRayWalker.h"
@@ -88,8 +89,10 @@ int main(int argc, char **argv) {
   */
   rt::render::Renderer<
     rt::render::SampleStrategy<
-      // "Iterate" by selecting the entire image as a subimage
-      rt::render::SimpleSubimageWalker,
+//      // "Iterate" by selecting the entire image as a subimage
+//      rt::render::SimpleSubimageWalker,
+      // Iterate through the image in a grid pattern
+      rt::render::GridSubimageWalker,
       // Select each pixel in the same order they appear in memory
       rt::render::SimplePixelWalker,
       // Select each sample in the same order they appear in memory

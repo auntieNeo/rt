@@ -1,6 +1,9 @@
 #ifndef RT_RENDER_SIMPLE_SUBIMAGE_WALKER_H_
 #define RT_RENDER_SIMPLE_SUBIMAGE_WALKER_H_
 
+#include "image.h"
+#include "subimage.h"
+
 namespace rt { namespace render {
   template <class PixelWalker,
             class SampleWalker>
@@ -8,6 +11,14 @@ namespace rt { namespace render {
     private:
       ImagePtr m_image;
     public:
+      class Iterator;
+
+      SimpleSubimageWalker(ImagePtr image);
+      ~SimpleSubimageWalker();
+
+      Iterator begin();
+      Iterator end();
+
       class Iterator {
         private:
           ImagePtr m_image;
@@ -17,19 +28,12 @@ namespace rt { namespace render {
           ~Iterator();
 
           Iterator &operator++();  // prefix
-//          Iterator &operator++(int);  // postfix
 
           bool operator==(const Iterator &other);
           bool operator!=(const Iterator &other) { return !(*this == other); }
 
           Subimage operator*();
       };
-
-      SimpleSubimageWalker(ImagePtr image);
-      ~SimpleSubimageWalker();
-
-      Iterator begin();
-      Iterator end();
   };
 
   template <class PixelWalker,
