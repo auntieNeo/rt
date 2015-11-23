@@ -17,10 +17,11 @@ namespace rt { namespace render {
   template <template<class, class> class SubimageWalker,
             template<class> class PixelWalker,
             template<class> class SampleWalker,
-            class RayWalker,
+            template<class> class RayWalker,
             template<class> class SampleDistributionDistribution,
             class SampleDistribution,
-            class HaltingStrategy>
+            class HaltingStrategy,
+            class PseudoRandomNumberEngine>
   class SampleStrategy {
     private:
       SampleDistributionDistribution<SampleDistribution> m_samples;
@@ -46,25 +47,31 @@ namespace rt { namespace render {
         return SampleWalker<SampleDistribution>(pixel, m_samples.atPixel(pixel.x(), pixel.y()));
       }
 
-      glm::dvec3 computeRadiance(const Ray &ray, const scene::Scene &scene) {
-        return RayWalker::computeRadiance(ray, scene);
+      glm::dvec3 computeRadiance(const Ray &ray, const scene::Scene &scene,
+          PseudoRandomNumberEngine &randomEngine) {
+        return RayWalker<PseudoRandomNumberEngine>::computeRadiance(ray, scene, randomEngine);
       }
 
       size_t numSamples(const Pixel &pixel) {
         return m_samples.atPixel(pixel.x(), pixel.y()).numSamples();
+      }
+
+      PseudoRandomNumberEngine pseudoRandomNumberEngine(unsigned int seed) {
+        return PseudoRandomNumberEngine(seed);
       }
   };
 
   template <template<class, class> class SubimageWalker,
             template<class> class PixelWalker,
             template<class> class SampleWalker,
-            class RayWalker,
+            template<class> class RayWalker,
             template<class> class SampleDistributionDistribution,
             class SampleDistribution,
-            class HaltingStrategy>
+            class HaltingStrategy,
+            class PseudoRandomNumberEngine>
   SampleStrategy<SubimageWalker, PixelWalker, SampleWalker, RayWalker,
     SampleDistributionDistribution, SampleDistribution,
-    HaltingStrategy>::SampleStrategy(int width, int height)
+    HaltingStrategy, PseudoRandomNumberEngine>::SampleStrategy(int width, int height)
       : m_samples(width, height)
   {
   }
@@ -72,13 +79,14 @@ namespace rt { namespace render {
   template <template<class, class> class SubimageWalker,
             template<class> class PixelWalker,
             template<class> class SampleWalker,
-            class RayWalker,
+            template<class> class RayWalker,
             template<class> class SampleDistributionDistribution,
             class SampleDistribution,
-            class HaltingStrategy>
+            class HaltingStrategy,
+            class PseudoRandomNumberEngine>
   SampleStrategy<SubimageWalker, PixelWalker, SampleWalker, RayWalker,
     SampleDistributionDistribution, SampleDistribution,
-    HaltingStrategy>::~SampleStrategy()
+    HaltingStrategy, PseudoRandomNumberEngine>::~SampleStrategy()
   {
   }
 } }

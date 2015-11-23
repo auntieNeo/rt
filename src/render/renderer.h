@@ -56,9 +56,11 @@ namespace rt {
         // Loop through each subimage, assigning each to a thread
         for (auto subimage : sampleStrategy.subimageWalker(image)) {
           debugStrategy.startSubimage(subimage);
-          // TODO: Each subimage needs a new random number generator whose seed
-          // is based on the coordinates of the subimage. This is to preserve
+          // Each subimage needs a new random number generator whose seed is
+          // based on the coordinates of the subimage. This is to preserve
           // determinism across threads.
+          auto randomEngine = sampleStrategy.pseudoRandomNumberEngine(
+              subimage.x() + subimage.y() * image->width());
           // Loop through each pixel in this subimage
           for (auto pixel : sampleStrategy.pixelWalker(subimage)) {
             debugStrategy.startPixel(pixel);
@@ -79,7 +81,7 @@ namespace rt {
               Ray ray(camera.position(), direction);
 
               // Walk through the ray tree to compute the radiance for this sample
-              glm::dvec3 sampleRadiance = sampleStrategy.computeRadiance(ray, scene);
+              glm::dvec3 sampleRadiance = sampleStrategy.computeRadiance(ray, scene, randomEngine);
 
               // FIXME: Do I need to clamp the sample radiance value?
 

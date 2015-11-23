@@ -21,7 +21,7 @@ namespace rt { namespace render {
     if (t == DBL_MAX)
       return glm::dvec3(1.0, 0.0, 1.0);
 
-    glm::dvec3 result;
+    glm::dvec3 result(0.0, 0.0, 0.0);
 
     // Get the point just outside the surface to avoid self-shadows
     glm::dvec4 outsidePoint = ray.point(t) + math::EPSILON * normal;

@@ -24,6 +24,7 @@
 #include "render/simpleRayWalker.h"
 #include "render/simpleRayCaster.h"
 #include "render/simpleRayTracer.h"
+#include "render/monteCarloRayTracer.h"
 #include "render/simpleSampleDistributionDistribution.h"
 #include "render/simpleSampleDistribution.h"
 #include "render/simpleHaltingStrategy.h"
@@ -70,6 +71,16 @@ int main(int argc, char **argv) {
         0.0,  // smoothness
         glm::dvec3(1.0, 1.0, 1.0)  // mirror
         ));
+  rt::scene::MaterialPropertiesPtr lightMaterial(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.0, 0.0, 0.0),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0,  // smoothness
+        glm::dvec3(0.0, 0.0, 0.0),  // mirror
+        glm::dvec3(0.0, 0.0, 0.0),  // refraction
+        1.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+        ));
 
   for (int i = 0; i < NUM_SPHERES; ++i) {
     double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
@@ -77,7 +88,7 @@ int main(int argc, char **argv) {
     std::unique_ptr<rt::scene::Sphere> sphere(
         new rt::scene::Sphere(
           4.0,  // radius
-          i == 1 ? mirrorMaterial : redMaterial,
+          i == 1 ? lightMaterial : redMaterial,
           glm::dvec4(pos, pos, -15.0 + pos, 1.0)  // position
           ));
     scene.addObject(std::move(sphere));
@@ -146,8 +157,10 @@ int main(int argc, char **argv) {
       rt::render::SimpleSampleWalker,
 //      // Simply compute the radiance from the first object hit by each ray
 //      rt::render::SimpleRayCaster,
-      // Follow the ray recursively for mirror and translucent surfaces
-      rt::render::SimpleRayTracer,
+//      // Follow the ray recursively for mirror and translucent surfaces
+//      rt::render::SimpleRayTracer,
+      // Use Monte Carlo method to approximate an integral solution
+      rt::render::MonteCarloRayTracer,
       // Use the same sample distribution for each pixel
       rt::render::SimpleSampleDistributionDistribution,
 //      // Take a single sample at the center of each pixel
@@ -155,7 +168,9 @@ int main(int argc, char **argv) {
       // Take samples in a poisson disk sample distribution at each pixel
       rt::render::PoissonDiskSampleDistribution,
       // Halt after taking each sample once
-      rt::render::SimpleHaltingStrategy
+      rt::render::SimpleHaltingStrategy,
+      // Use 32-bit Mersenne Twister to generate pseudo random numbers
+      std::mt19937
     >,
     rt::render::PreviewWindowDebugStrategy<
       rt::render::PreviewWindowImageListener,
@@ -166,7 +181,7 @@ int main(int argc, char **argv) {
       rt::render::PreviewWindowNullRayListener
     >
   > simpleRenderer;
-  simpleRenderer.renderScene(scene, camera, 500, 500);
+  simpleRenderer.renderScene(scene, camera, 200, 200);
 
   /*
   rt::render::Renderer<
