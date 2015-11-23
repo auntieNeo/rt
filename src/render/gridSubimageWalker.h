@@ -14,7 +14,7 @@ namespace rt { namespace render {
       class Iterator;
 
       // FIXME: Make these configurable using template parameters
-      static const int rows = 5, columns = 5;
+      static const int rows = 10, columns = 10;
 
       GridSubimageWalker(ImagePtr image) { m_image = image; }
       ~GridSubimageWalker() {}
@@ -39,13 +39,16 @@ namespace rt { namespace render {
           Iterator &operator++() {  // prefix
             m_column = (m_column + 1) % columns;
             m_row = m_column == 0 ? m_row + 1 : m_row;
+            return *this;
           }
 
-          bool operator==(const Iterator &other) {
+          bool operator==(const Iterator &other) const {
             return (this->m_row == other.m_row) &&
                    (this->m_column == other.m_column);
           }
-          bool operator!=(const Iterator &other) { return !(*this == other); }
+          bool operator!=(const Iterator &other) const {
+            return !(*this == other);
+          }
 
           Subimage operator*() {
             int rowSize = m_image->height() / rows;

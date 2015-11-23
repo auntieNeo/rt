@@ -23,8 +23,7 @@ namespace rt { namespace render {
 
       void drawPixel(int x, int y, int r, int g, int b);
 
-    private:
-      void m_update();
+      void update();
   };
 
   typedef std::shared_ptr<PreviewWindow> PreviewWindowPtr;

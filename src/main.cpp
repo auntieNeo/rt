@@ -23,6 +23,7 @@
 #include "render/simpleSampleWalker.h"
 #include "render/simpleRayWalker.h"
 #include "render/simpleRayCaster.h"
+#include "render/simpleRayTracer.h"
 #include "render/simpleSampleDistributionDistribution.h"
 #include "render/simpleSampleDistribution.h"
 #include "render/simpleHaltingStrategy.h"
@@ -40,12 +41,34 @@ int main(int argc, char **argv) {
         glm::dvec3(0.1, 0.1, 0.1),  // specular
         600.0  // smoothness
         ));
-  rt::scene::MaterialPropertiesPtr grayMaterial(
+  rt::scene::MaterialPropertiesPtr redDiffuse(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.9, 0.1, 0.1),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0  // smoothness
+        ));
+  rt::scene::MaterialPropertiesPtr greenDiffuse(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
         glm::dvec3(0.1, 0.9, 0.1),  // diffuse
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
+        ));
+  rt::scene::MaterialPropertiesPtr blueDiffuse(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.1, 0.1, 0.9),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0  // smoothness
+        ));
+  rt::scene::MaterialPropertiesPtr mirrorMaterial(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.0, 0.0, 0.0),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0,  // smoothness
+        glm::dvec3(1.0, 1.0, 1.0)  // mirror
         ));
 
   for (int i = 0; i < NUM_SPHERES; ++i) {
@@ -53,24 +76,48 @@ int main(int argc, char **argv) {
     pos *= 5.0;
     std::unique_ptr<rt::scene::Sphere> sphere(
         new rt::scene::Sphere(
-          8.0,  // radius
-          redMaterial,
-          glm::dvec4(pos, pos, -40.0 + pos, 1.0)  // position
+          4.0,  // radius
+          i == 1 ? mirrorMaterial : redMaterial,
+          glm::dvec4(pos, pos, -15.0 + pos, 1.0)  // position
           ));
     scene.addObject(std::move(sphere));
   }
 
-  std::unique_ptr<rt::scene::Plane> plane(
+  std::unique_ptr<rt::scene::Plane> backWall(
       new rt::scene::Plane(
-        grayMaterial,
-        glm::dvec4(0.0, 0.0, -45.0, 1.0),  // position
+        redDiffuse,
+        glm::dvec4(0.0, 0.0, -20.0, 1.0),  // position
         glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 1.0, 0.0))));  // orientation
-  scene.addObject(std::move(plane));
+  scene.addObject(std::move(backWall));
+  std::unique_ptr<rt::scene::Plane> leftWall(
+      new rt::scene::Plane(
+        blueDiffuse,
+        glm::dvec4(-10.0, 0.0, 0.0, 1.0),  // position
+        glm::angleAxis(0.0, glm::dvec3(1.0, 0.0, 0.0))));  // orientation
+  scene.addObject(std::move(leftWall));
+  std::unique_ptr<rt::scene::Plane> rightWall(
+      new rt::scene::Plane(
+        blueDiffuse,
+        glm::dvec4(10.0, 0.0, 0.0, 1.0),  // position
+        glm::angleAxis(M_PI, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
+  scene.addObject(std::move(rightWall));
+  std::unique_ptr<rt::scene::Plane> ceiling(
+      new rt::scene::Plane(
+        greenDiffuse,
+        glm::dvec4(0.0, 10.0, 0.0, 1.0),  // position
+        glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
+  scene.addObject(std::move(ceiling));
+  std::unique_ptr<rt::scene::Plane> floor(
+      new rt::scene::Plane(
+        greenDiffuse,
+        glm::dvec4(0.0, -10.0, 0.0, 1.0),  // position
+        glm::angleAxis(M_PI / 2.0, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
+  scene.addObject(std::move(floor));
 
   std::unique_ptr<rt::scene::PointLight> light(
       new rt::scene::PointLight(
-        glm::dvec3(1000.0, 1000.0, 1000.0),      // intensity
-        glm::dvec4(0.5, 10.0, -20.0, 1.0)  // position
+        glm::dvec3(1200.0, 1200.0, 1200.0),      // intensity
+        glm::dvec4(-9.0, 9.0, -0.5, 1.0)  // position
         ));
   scene.addObject(std::move(light));
 
@@ -97,8 +144,10 @@ int main(int argc, char **argv) {
       rt::render::SimplePixelWalker,
       // Select each sample in the same order they appear in memory
       rt::render::SimpleSampleWalker,
-      // Simply compute the radiance from the first object hit by each ray
-      rt::render::SimpleRayCaster,
+//      // Simply compute the radiance from the first object hit by each ray
+//      rt::render::SimpleRayCaster,
+      // Follow the ray recursively for mirror and translucent surfaces
+      rt::render::SimpleRayTracer,
       // Use the same sample distribution for each pixel
       rt::render::SimpleSampleDistributionDistribution,
 //      // Take a single sample at the center of each pixel
@@ -111,13 +160,13 @@ int main(int argc, char **argv) {
     rt::render::PreviewWindowDebugStrategy<
       rt::render::PreviewWindowImageListener,
       rt::render::PreviewWindowNullPassListener,
-      rt::render::PreviewWindowNullSubimageListener,
-      rt::render::PreviewWindowPixelListener,
+      rt::render::PreviewWindowSubimageListener,
+      rt::render::PreviewWindowNullPixelListener,
       rt::render::PreviewWindowNullSampleListener,
       rt::render::PreviewWindowNullRayListener
     >
   > simpleRenderer;
-  simpleRenderer.renderScene(scene, camera, 100, 100);
+  simpleRenderer.renderScene(scene, camera, 500, 500);
 
   /*
   rt::render::Renderer<

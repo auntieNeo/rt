@@ -8,7 +8,7 @@ namespace rt { namespace render {
     scene::DrawableObjectPtr object;
     double t = scene.intersect(ray, normal, object);
     if (t == DBL_MAX)
-      return glm::dvec3(0.0, 0.0, 1.0);
+      return glm::dvec3(1.0, 0.0, 1.0);
 
     // Compute light contribution from point light sources
     glm::dvec3 localLight(0.0, 0.0, 0.0);
@@ -28,7 +28,7 @@ namespace rt { namespace render {
         if (occlusionDistance < lightDistance)
           continue;  // We are in shadow for this light source
       }
-      // TODO: Add the contribution from this light source
+      // Add the contribution from this light source to the sum
       localLight += shading(
           ray,
           t,
@@ -38,7 +38,7 @@ namespace rt { namespace render {
           *(object->material()));
     }
 
-    return localLight;
+    return localLight + object->material()->ambient();
   }
 
   glm::dvec3 SimpleRayCaster::shading(const Ray &ray, double t, double r,
@@ -61,6 +61,5 @@ namespace rt { namespace render {
     glm::dvec3 irradiance = lightIrradiance * dot(lightVector, normal);
 
     return reflectivity * irradiance;
-//    return reflectivity;
   }
 } }

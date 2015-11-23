@@ -62,6 +62,25 @@ namespace rt { namespace render {
       void endPass(const ImagePtr image) {}
   };
 
+  class PreviewWindowSubimageListener {
+    private:
+      PreviewWindowPtr m_previewWindow;
+    public:
+      PreviewWindowSubimageListener(PreviewWindowPtr previewWindow)
+        : m_previewWindow(previewWindow) {}
+      void startSubimage(const Subimage &subimage) {}
+      void endSubimage(const Subimage &subimage) {
+        for (Pixel p : subimage) {
+          m_previewWindow->drawPixel(
+              p.x(), -(p.y()) + m_previewWindow->height() - 1,
+              int(std::min(std::max(p.r(), 0.0), 1.0) * 255.0),
+              int(std::min(std::max(p.g(), 0.0), 1.0) * 255.0),
+              int(std::min(std::max(p.b(), 0.0), 1.0) * 255.0));
+        }
+        m_previewWindow->update();
+      }
+  };
+
   class PreviewWindowNullSubimageListener {
     public:
       PreviewWindowNullSubimageListener(PreviewWindowPtr previewWindow) {}
@@ -82,6 +101,7 @@ namespace rt { namespace render {
             int(std::min(std::max(pixel.r(), 0.0), 1.0) * 255.0),
             int(std::min(std::max(pixel.g(), 0.0), 1.0) * 255.0),
             int(std::min(std::max(pixel.b(), 0.0), 1.0) * 255.0));
+        m_previewWindow->update();
       }
   };
 

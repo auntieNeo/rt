@@ -8,6 +8,7 @@ add_library(render STATIC
     sample.cpp
     simpleHaltingStrategy.cpp
     simpleRayCaster.cpp
+    simpleRayTracer.cpp
     simpleSampleDistribution.cpp
     subimage.cpp
     )

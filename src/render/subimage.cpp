@@ -21,4 +21,8 @@ namespace rt { namespace render {
     assert(m_y + y < m_image->height());
     return Pixel(m_image, m_x + x, m_y + y);
   }
+
+  const Pixel Subimage::pixel(int x, int y) const {
+    return (const Pixel)((Subimage *)(this))->pixel(x, y);
+  }
 } }

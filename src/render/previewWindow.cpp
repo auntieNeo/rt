@@ -26,14 +26,12 @@ namespace rt { namespace render {
     SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
     SDL_RenderClear(m_renderer);
 
-    this->m_update();
+    this->update();
   }
 
   void PreviewWindow::drawPixel(int x, int y, int r, int g, int b) {
     SDL_SetRenderDrawColor(m_renderer, r, g, b, 255);
     SDL_RenderDrawPoint(m_renderer, x, y);
-
-    this->m_update();
   }
 
   void PreviewWindow::waitForCloseWindow() {
@@ -53,7 +51,7 @@ namespace rt { namespace render {
     SDL_DestroyWindow(m_window);
   }
 
-  void PreviewWindow::m_update() {
+  void PreviewWindow::update() {
     SDL_RenderPresent(m_renderer);
   }
 } }

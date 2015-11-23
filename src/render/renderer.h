@@ -4,6 +4,8 @@
 #define GLM_SWIZZLE
 #include <glm/glm.hpp>
 
+#include <omp.h>
+
 #include "../ray.h"
 #include "../scene/drawableObject.h"
 #include "image.h"
