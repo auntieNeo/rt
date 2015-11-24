@@ -2,6 +2,7 @@
 #define RT_RENDER_RENDERER_H_
 
 #include <memory>
+#include <thread>
 
 #define GLM_SWIZZLE
 #include <glm/glm.hpp>
@@ -42,7 +43,8 @@ namespace rt {
     void Renderer<SampleStrategy, DebugStrategy>::renderScene(
         const scene::Scene &scene, const scene::Camera &camera, int width, int height)
     {
-      WorkerPool workers(2);  // FIXME: Allow runtime configuration of number of workers
+      // TODO: Allow user configuration of the number of workers
+      WorkerPool workers(std::thread::hardware_concurrency());
       std::shared_ptr<DebugStrategy> debugStrategy = DebugStrategy::getDebugStrategy();
       ImagePtr image(new Image(width, height));
       debugStrategy->startImage(image);
