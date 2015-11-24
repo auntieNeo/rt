@@ -11,6 +11,9 @@ add_library(render STATIC
     simpleRayTracer.cpp
     simpleSampleDistribution.cpp
     subimage.cpp
+    task.cpp
+    worker.cpp
+    workerPool.cpp
     )
 target_link_libraries(render
     common

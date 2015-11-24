@@ -19,6 +19,7 @@ namespace rt { namespace render {
       int y() const { return m_y; }
       int width() const { return m_width; }
       int height() const { return m_height; }
+      ImagePtr image() { return m_image; }
 
       Pixel pixel(int x, int y);
       const Pixel pixel(int x, int y) const;

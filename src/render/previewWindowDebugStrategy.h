@@ -25,9 +25,10 @@ namespace rt { namespace render {
     public:
       ~PreviewWindowDebugStrategy();
 
-      static PreviewWindowDebugStrategy getDebugStrategy() {
+      static std::shared_ptr<PreviewWindowDebugStrategy> getDebugStrategy() {
         PreviewWindowPtr previewWindow(new PreviewWindow);
-        return PreviewWindowDebugStrategy(previewWindow);
+        return std::shared_ptr<PreviewWindowDebugStrategy>(
+            new PreviewWindowDebugStrategy(previewWindow));
       }
   };
 
