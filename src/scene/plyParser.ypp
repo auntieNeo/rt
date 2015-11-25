@@ -1,0 +1,125 @@
+%{
+#include <cstdio>
+#include <string>
+
+#include "plyParser.hpp"
+#include "plyLexer.h"
+
+int yyerror(yyscan_t yyscanner, const char *message) {
+  fprintf(stderr, "Parse error: %s", message);
+}
+%}
+
+%code requires {
+/* avoid a recursive header dependency */
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
+typedef void* yyscan_t;
+#endif
+}
+
+%define api.pure
+%define parse.error verbose
+%define parse.lac full
+%lex-param { yyscan_t yyscanner }
+%parse-param { yyscan_t yyscanner }
+
+%union {
+  int integer;
+  double floatingPoint;
+  std::string *string;
+}
+
+%token PLY_TOKEN
+%token FORMAT_TOKEN
+%token PROPERTY_TOKEN
+%token COMMENT_TOKEN
+%token COMMENT_STRING_TOKEN
+%token ELEMENT_TOKEN
+%token VERTEX_TOKEN
+%token FACE_TOKEN
+%token LIST_TOKEN
+%token NEWLINE_TOKEN
+%token END_HEADER_TOKEN
+%token INT_TOKEN
+%token FLOAT_TOKEN
+%token UCHAR_TOKEN
+%token <integer> INTEGER_TOKEN
+%token <floatingPoint> FLOATING_POINT_TOKEN
+%token <string> VERSION_TOKEN
+%token <string> IDENTIFIER_TOKEN
+
+%%
+
+goal:   PLY_TOKEN NEWLINE_TOKEN header body
+;
+
+header:   header_lines END_HEADER_TOKEN NEWLINE_TOKEN
+;
+
+header_lines:   /* empty */
+              | header_lines header_line
+              ;
+
+header_line:   NEWLINE_TOKEN
+             | FORMAT_TOKEN format NEWLINE_TOKEN
+             | COMMENT_TOKEN comment NEWLINE_TOKEN
+             | ELEMENT_TOKEN element NEWLINE_TOKEN
+             | PROPERTY_TOKEN property NEWLINE_TOKEN
+             ;
+
+comment:   COMMENT_STRING_TOKEN  ;
+
+format:   VERSION_TOKEN  ;
+
+element: VERTEX_TOKEN INTEGER_TOKEN
+       | FACE_TOKEN INTEGER_TOKEN
+       ;
+
+property: type IDENTIFIER_TOKEN
+        | LIST_TOKEN integer_type type IDENTIFIER_TOKEN
+               ;
+
+body:   body_lines ;
+
+body_lines:   /* empty */
+            | body_lines body_line
+            ;
+
+body_line:   NEWLINE_TOKEN
+           | tuple NEWLINE_TOKEN
+           ;
+
+tuple:   tuple_elements
+
+tuple_elements:   tuple_element
+                | tuple_elements tuple_element
+                ;
+
+tuple_element:   FLOATING_POINT_TOKEN
+               | INTEGER_TOKEN
+               ;
+
+type:   integer_type
+      | FLOAT_TOKEN
+      ;
+
+integer_type:   INT_TOKEN
+              | UCHAR_TOKEN
+              ;
+
+%%
+
+int main(int argc, char **argv)
+{
+  ++argv, --argc;  /* skip over program name */
+
+  yyscan_t scanner;
+  if (yylex_init(&scanner)) {
+    return 1;  // Error initializing the scanner
+  }
+
+  yyparse(scanner);
+
+  yylex_destroy(scanner);
+}

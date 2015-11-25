@@ -4,7 +4,8 @@
 
 namespace rt { namespace render {
   Image::Image(int width, int height)
-    : m_data(width * height), m_width(width), m_height(height)
+    : m_data(width * height, glm::dvec3(0.0, 0.0, 0.0)),
+    m_width(width), m_height(height)
   {
   }
 

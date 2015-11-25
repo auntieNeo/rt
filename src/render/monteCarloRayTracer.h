@@ -16,7 +16,7 @@ namespace rt { namespace render {
           const Ray &ray, const scene::Scene &scene,
           PseudoRandomNumberEngine &randomEngine);
 
-      static const int NUM_SAMPLES = 10;
+      static const int NUM_SAMPLES = 1;
       static const int MAX_DEPTH = 15;
 
       static glm::dvec3 m_trace(

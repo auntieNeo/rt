@@ -16,8 +16,6 @@ namespace rt { namespace render {
       Image(int width, int height);
       ~Image();
 
-      glm::dvec3 &at(int x, int y) { return m_data.at(x + y * m_data.size()); }
-
       int width() const { return m_width; }
       int height() const { return m_height; }
 

@@ -6,7 +6,6 @@ add_library(render STATIC
     poissonDiskSampleDistribution.cpp
     previewWindow.cpp
     sample.cpp
-    simpleHaltingStrategy.cpp
     simpleRayCaster.cpp
     simpleRayTracer.cpp
     simpleSampleDistribution.cpp

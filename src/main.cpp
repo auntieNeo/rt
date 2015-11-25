@@ -28,6 +28,7 @@
 #include "render/simpleSampleDistributionDistribution.h"
 #include "render/simpleSampleDistribution.h"
 #include "render/simpleHaltingStrategy.h"
+#include "render/passCountHaltingStrategy.h"
 #include "render/previewWindowDebugStrategy.h"
 
 int main(int argc, char **argv) {
@@ -79,7 +80,7 @@ int main(int argc, char **argv) {
         0.0,  // smoothness
         glm::dvec3(0.0, 0.0, 0.0),  // mirror
         glm::dvec3(0.0, 0.0, 0.0),  // refraction
-        1.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+        4.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
         ));
 
   for (int i = 0; i < NUM_SPHERES; ++i) {
@@ -167,8 +168,8 @@ int main(int argc, char **argv) {
 //      rt::render::SimpleSampleDistribution,
       // Take samples in a poisson disk sample distribution at each pixel
       rt::render::PoissonDiskSampleDistribution,
-      // Halt after taking each sample once
-      rt::render::SimpleHaltingStrategy,
+      // Halt after 10 passes
+      rt::render::PassCountHaltingStrategy<100>,
       // Use 32-bit Mersenne Twister to generate pseudo random numbers
       std::mt19937
     >,
@@ -181,7 +182,7 @@ int main(int argc, char **argv) {
       rt::render::PreviewWindowNullRayListener
     >
   > simpleRenderer;
-  simpleRenderer.renderScene(scene, camera, 200, 200);
+  simpleRenderer.renderScene(scene, camera, 500, 500);
 
   /*
   rt::render::Renderer<

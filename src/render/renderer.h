@@ -46,33 +46,38 @@ namespace rt {
       // TODO: Allow user configuration of the number of workers
       WorkerPool workers(std::thread::hardware_concurrency());
       std::shared_ptr<DebugStrategy> debugStrategy = DebugStrategy::getDebugStrategy();
-      ImagePtr image(new Image(width, height));
-      debugStrategy->startImage(image);
+      ImagePtr accumulatorImage(new Image(width, height)),  // Accumulates the result
+               passImage(new Image(width, height)),  // Buffer for intermediate passes
+               previewImage(new Image(width, height));  // Preview for display
+      debugStrategy->startImage(previewImage);
       std::shared_ptr<SampleStrategy> sampleStrategy(
           new SampleStrategy(width, height));
       size_t passCount = 0;
       size_t sampleCount = 0;
 
       // Loop until the sample strategy determines that we should stop
-      while (!sampleStrategy->checkHaltCondition(image, passCount, sampleCount)) {
+      while (!sampleStrategy->checkHaltCondition(accumulatorImage, passCount, sampleCount)) {
         // TODO: Give the sample strategy an opportunity to re-calculate the
         // sample distribution here.
-        debugStrategy->startPass(image);
+        debugStrategy->startPass(previewImage);
         // Loop through each subimage, assigning each to a thread
-        for (auto subimage : sampleStrategy->subimageWalker(image)) {
+        for (auto subimage : sampleStrategy->subimageWalker(passImage)) {
           // Dispatch the task of rendering this subimage to a worker thread
           TaskPtr renderTask(
               new RenderTask<SampleStrategy, DebugStrategy>(
-                &scene, &camera, subimage, sampleStrategy, debugStrategy));
+                &scene, &camera,
+                subimage, accumulatorImage, previewImage,
+                sampleStrategy, debugStrategy,
+                passCount + 1));
           workers.dispatch(renderTask);
         }
-        debugStrategy->endPass(image);
+        debugStrategy->endPass(previewImage);
         passCount += 1;
       }
       // TODO: Block until the image has been rendered?
       // TODO: Apply high dynamic range filter
       // TODO: Apply gamma correction
-      debugStrategy->endImage(image);
+      debugStrategy->endImage(previewImage);
     }
   }
 }

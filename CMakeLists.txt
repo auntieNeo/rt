@@ -10,6 +10,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(SDL2 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(GLM REQUIRED)
+find_package(FLEX REQUIRED)
+find_package(BISON REQUIRED)
 
 include_directories(SYSTEM
     ${SDL2_INCLUDE_DIR}

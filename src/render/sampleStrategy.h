@@ -32,7 +32,7 @@ namespace rt { namespace render {
       bool checkHaltCondition(
           ImagePtr image, size_t passCount, size_t sampleCount) const
       {
-        return HaltingStrategy().checkHaltCondition(image, passCount, sampleCount);
+        return HaltingStrategy::checkHaltCondition(image, passCount, sampleCount);
       }
 
       auto subimageWalker(ImagePtr image) {
