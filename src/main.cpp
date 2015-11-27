@@ -31,6 +31,9 @@
 #include "render/passCountHaltingStrategy.h"
 #include "render/previewWindowDebugStrategy.h"
 
+#include "scene/triangleMesh.h"
+#include "scene/triangleMeshBuilder.h"
+
 int main(int argc, char **argv) {
   rt::scene::Scene scene;
 
@@ -80,9 +83,21 @@ int main(int argc, char **argv) {
         0.0,  // smoothness
         glm::dvec3(0.0, 0.0, 0.0),  // mirror
         glm::dvec3(0.0, 0.0, 0.0),  // refraction
-        4.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+//        4.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+        50.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
         ));
 
+  // Load the bunny mesh
+  rt::scene::TriangleMeshBuilder builder;
+  /*
+  std::unique_ptr<rt::scene::TriangleMesh> bunny =
+    builder.build("../sandbox/bunny/reconstruction/bun_zipper_res4.ply", lightMaterial);
+    */
+  std::unique_ptr<rt::scene::TriangleMesh> bunny =
+    builder.build("../sandbox/test.ply", lightMaterial);
+  scene.addObject(std::move(bunny));
+
+  /*
   for (int i = 0; i < NUM_SPHERES; ++i) {
     double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
     pos *= 5.0;
@@ -94,6 +109,7 @@ int main(int argc, char **argv) {
           ));
     scene.addObject(std::move(sphere));
   }
+  */
 
   std::unique_ptr<rt::scene::Plane> backWall(
       new rt::scene::Plane(

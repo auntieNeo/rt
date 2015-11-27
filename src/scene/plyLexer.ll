@@ -6,6 +6,7 @@
 #include "plyParser.hpp"
 %}
 
+/* %option prefix="ply" */
 %option bison-bridge
 %option warn noyywrap reentrant
 
@@ -35,15 +36,39 @@ VERSION_STRING ([[:digit:]]+".")*[[:digit:]]
 "int"  { return INT_TOKEN; }
 "uchar"  { return UCHAR_TOKEN; }
 
+"x"  { return X_TOKEN; }
+"y"  { return Y_TOKEN; }
+"z"  { return Z_TOKEN; }
+
+"vertex_indices"  { return VERTEX_INDICES_TOKEN; }
+
 "end_header"  { return END_HEADER_TOKEN; }
 
-"-"?[[:digit:]]+  { return INTEGER_TOKEN; }
-"-"?[[:digit:]]+"."[[:digit:]]*  { return FLOATING_POINT_TOKEN; }
+"-"?[[:digit:]]+ {
+  try {
+    yylval->integer = std::stoi(yytext);
+  } catch (...) {
+    return ERROR_TOKEN;
+  }
+  return INTEGER_TOKEN;
+}
 
-{ID} { return IDENTIFIER_TOKEN; }
+"-"?[[:digit:]]+"."[[:digit:]]* {
+  try {
+    yylval->floatingPoint = std::stod(yytext);
+  } catch (...) {
+    return ERROR_TOKEN;
+  }
+  return FLOATING_POINT_TOKEN;
+}
+
+{ID} {
+  yylval->cstring = yytext;
+  return IDENTIFIER_TOKEN;
+}
 
 [\r\n]+  { return NEWLINE_TOKEN; }
 
-[:space:]+  { /* ignore whitespace */ }
+[ \t]+  { /* ignore whitespace */ }
 
 %%

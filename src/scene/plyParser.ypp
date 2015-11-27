@@ -1,16 +1,20 @@
 %{
 #include <cstdio>
-#include <string>
+#include <vector>
 
 #include "plyParser.hpp"
 #include "plyLexer.h"
 
-int yyerror(yyscan_t yyscanner, const char *message) {
+#include "triangleMeshBuilder.h"
+
+int yyerror(rt::scene::TriangleMeshBuilder *builder, yyscan_t yyscanner, const char *message) {
   fprintf(stderr, "Parse error: %s", message);
 }
 %}
 
 %code requires {
+#include <vector>
+#include "triangleMeshBuilder.h"
 /* avoid a recursive header dependency */
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
@@ -18,17 +22,23 @@ typedef void* yyscan_t;
 #endif
 }
 
-%define api.pure
+/* %define api.prefix {ply} */
+%define api.pure full
 %define parse.error verbose
 %define parse.lac full
 %lex-param { yyscan_t yyscanner }
-%parse-param { yyscan_t yyscanner }
+%parse-param { rt::scene::TriangleMeshBuilder *builder } { yyscan_t yyscanner }
 
 %union {
-  int integer;
+  long int integer;
   double floatingPoint;
-  std::string *string;
+  const char *cstring;
+  int type;  // FIXME: Use an enum or something
+  std::vector<rt::scene::TriangleMeshBuilder::Number> *tuple;
+  rt::scene::TriangleMeshBuilder::Number number;
 }
+
+%token ERROR_TOKEN
 
 %token PLY_TOKEN
 %token FORMAT_TOKEN
@@ -36,90 +46,136 @@ typedef void* yyscan_t;
 %token COMMENT_TOKEN
 %token COMMENT_STRING_TOKEN
 %token ELEMENT_TOKEN
-%token VERTEX_TOKEN
-%token FACE_TOKEN
 %token LIST_TOKEN
 %token NEWLINE_TOKEN
 %token END_HEADER_TOKEN
 %token INT_TOKEN
 %token FLOAT_TOKEN
 %token UCHAR_TOKEN
+
+%token VERTEX_TOKEN
+%token FACE_TOKEN
+
+%token X_TOKEN
+%token Y_TOKEN
+%token Z_TOKEN
+
+%token VERTEX_INDICES_TOKEN
+
 %token <integer> INTEGER_TOKEN
 %token <floatingPoint> FLOATING_POINT_TOKEN
-%token <string> VERSION_TOKEN
-%token <string> IDENTIFIER_TOKEN
+%token <cstring> VERSION_TOKEN
+%token <cstring> IDENTIFIER_TOKEN
+
+%type <type> type
+%type <number> tuple_element
+%type <tuple> tuple_elements
 
 %%
 
-goal:   PLY_TOKEN NEWLINE_TOKEN header body
+goal: PLY_TOKEN NEWLINE_TOKEN header body
 ;
 
-header:   header_lines END_HEADER_TOKEN NEWLINE_TOKEN
+header: header_lines END_HEADER_TOKEN NEWLINE_TOKEN
 ;
 
-header_lines:   /* empty */
-              | header_lines header_line
-              ;
-
-header_line:   NEWLINE_TOKEN
-             | FORMAT_TOKEN format NEWLINE_TOKEN
-             | COMMENT_TOKEN comment NEWLINE_TOKEN
-             | ELEMENT_TOKEN element NEWLINE_TOKEN
-             | PROPERTY_TOKEN property NEWLINE_TOKEN
-             ;
-
-comment:   COMMENT_STRING_TOKEN  ;
-
-format:   VERSION_TOKEN  ;
-
-element: VERTEX_TOKEN INTEGER_TOKEN
-       | FACE_TOKEN INTEGER_TOKEN
-       ;
-
-property: type IDENTIFIER_TOKEN
-        | LIST_TOKEN integer_type type IDENTIFIER_TOKEN
-               ;
-
-body:   body_lines ;
-
-body_lines:   /* empty */
-            | body_lines body_line
+header_lines: /* empty */
+            | header_lines header_line
             ;
 
-body_line:   NEWLINE_TOKEN
-           | tuple NEWLINE_TOKEN
+header_line: NEWLINE_TOKEN
+           | FORMAT_TOKEN format NEWLINE_TOKEN
+           | COMMENT_TOKEN comment NEWLINE_TOKEN
+           | ELEMENT_TOKEN element NEWLINE_TOKEN
+           | PROPERTY_TOKEN property NEWLINE_TOKEN
            ;
 
-tuple:   tuple_elements
+comment: COMMENT_STRING_TOKEN ;
 
-tuple_elements:   tuple_element
-                | tuple_elements tuple_element
-                ;
+format: VERSION_TOKEN ;
 
-tuple_element:   FLOATING_POINT_TOKEN
-               | INTEGER_TOKEN
-               ;
+element: VERTEX_TOKEN INTEGER_TOKEN  {
+           if ($2 <= 0) {
+             yyerror(builder, yyscanner,
+                 "vertex count must be 1 or greater");
+           }
+           builder->elementVertex($2);
+         }
+       | FACE_TOKEN INTEGER_TOKEN {
+           if ($2 <= 0) {
+             yyerror(builder, yyscanner,
+                 "face count must be 1 or greater");
+           }
+           builder->elementFace($2);
+         }
+       ;
 
-type:   integer_type
-      | FLOAT_TOKEN
-      ;
+property: type IDENTIFIER_TOKEN {
+            builder->property($1, $2);
+          }
+        | type X_TOKEN {
+            builder->xProperty($1);
+          }
+        | type Y_TOKEN {
+            builder->yProperty($1);
+          }
+        | type Z_TOKEN {
+            builder->zProperty($1);
+          }
+        | LIST_TOKEN integer_type type IDENTIFIER_TOKEN {
+            builder->propertyList($3, $4);
+          }
+        | LIST_TOKEN integer_type type VERTEX_INDICES_TOKEN {
+            builder->vertexIndicesPropertyList($3);
+          }
+        ;
 
-integer_type:   INT_TOKEN
-              | UCHAR_TOKEN
+body: body_lines ;
+
+body_lines: /* empty */
+          | body_lines body_line
+          ;
+
+body_line: NEWLINE_TOKEN
+         | tuple NEWLINE_TOKEN
+         ;
+
+tuple: tuple_elements {
+         builder->tuple(*$1);
+         delete $1;
+       }
+     ;
+
+tuple_elements: tuple_element {
+                  std::vector<rt::scene::TriangleMeshBuilder::Number> *tuple =
+                    new std::vector<rt::scene::TriangleMeshBuilder::Number>();
+                  tuple->push_back($1);
+                  $$ = tuple;
+                }
+              | tuple_elements tuple_element {
+                  $1->push_back($2);
+                  $$ = $1;
+                }
               ;
 
+tuple_element: INTEGER_TOKEN {
+                 rt::scene::TriangleMeshBuilder::Number number;
+                 number.i = $1;
+                 $$ = number;
+               }
+             | FLOATING_POINT_TOKEN {
+                 rt::scene::TriangleMeshBuilder::Number number;
+                 number.d = $1;
+                 $$ = number;
+               }
+             ;
+
+type: integer_type { $$ = 0; }
+    | FLOAT_TOKEN { $$ = 1; }
+    ;
+
+integer_type: INT_TOKEN
+            | UCHAR_TOKEN
+            ;
+
 %%
-
-int main(int argc, char **argv)
-{
-  ++argv, --argc;  /* skip over program name */
-
-  yyscan_t scanner;
-  if (yylex_init(&scanner)) {
-    return 1;  // Error initializing the scanner
-  }
-
-  yyparse(scanner);
-
-  yylex_destroy(scanner);
-}

@@ -15,7 +15,8 @@ namespace rt {
         MaterialPropertiesPtr m_materialProperties;
       public:
         DrawableObject(MaterialPropertiesPtr materialProperties,
-            glm::dvec4 position, glm::dquat orientation);
+            const glm::dvec4 &position = glm::dvec4(0.0, 0.0, 0.0, 1.0),
+            const glm::dquat &orientation = glm::dquat());
         virtual ~DrawableObject();
 
         MaterialPropertiesPtr material() { return m_materialProperties; }

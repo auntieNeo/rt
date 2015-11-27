@@ -16,7 +16,7 @@ namespace rt { namespace scene {
       glm::dquat m_orientation;
 
     public:
-      SceneObject(glm::dvec4 position, glm::dquat orientation);
+      SceneObject(const glm::dvec4 &position, const glm::dquat &orientation);
       virtual ~SceneObject();
 
       glm::dvec4 position() const { return m_position; }
