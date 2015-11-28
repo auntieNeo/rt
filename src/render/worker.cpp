@@ -7,7 +7,7 @@
 namespace rt { namespace render {
   Worker::Worker(WorkerPool *pool)
     : m_pool(pool), m_task(nullptr), m_taskReady(),
-    m_thread([this] { this->m_run(); })
+    m_thread([this] { this->m_run(); }), m_join(false)
   {
   }
 

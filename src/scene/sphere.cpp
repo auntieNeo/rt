@@ -37,7 +37,7 @@ namespace rt { namespace scene {
       (t_1 != 0.0 ? t_1 : t_0);
 
     if (t == 0.0)
-      return 0.0;  // Sphere is behind the ray
+      return DBL_MAX;  // Sphere is behind the ray
 
     // Compute and return the normal
     normal = glm::normalize(ray.point(t) - this->position());

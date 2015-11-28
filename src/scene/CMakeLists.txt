@@ -5,6 +5,7 @@ BISON_TARGET(plyParser plyParser.ypp "${CMAKE_CURRENT_BINARY_DIR}/plyParser.cpp"
 ADD_FLEX_BISON_DEPENDENCY(plyLexer plyParser)
 
 add_library(scene STATIC
+    aabb.cpp
     camera.cpp
     drawableObject.cpp
     materialProperties.cpp

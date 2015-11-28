@@ -83,18 +83,18 @@ int main(int argc, char **argv) {
         0.0,  // smoothness
         glm::dvec3(0.0, 0.0, 0.0),  // mirror
         glm::dvec3(0.0, 0.0, 0.0),  // refraction
-//        4.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
-        50.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+        4.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+//        50.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
         ));
 
   // Load the bunny mesh
   rt::scene::TriangleMeshBuilder builder;
-  /*
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
     builder.build("../sandbox/bunny/reconstruction/bun_zipper_res4.ply", lightMaterial);
-    */
+  /*
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
     builder.build("../sandbox/test.ply", lightMaterial);
+    */
   scene.addObject(std::move(bunny));
 
   /*

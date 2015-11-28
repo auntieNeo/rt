@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include "aabb.h"
+#include "bvh.h"
 #include "drawableObject.h"
 
 namespace rt { namespace scene {
@@ -12,6 +14,7 @@ namespace rt { namespace scene {
       class Triangle;
     private:
       std::vector<Triangle> m_triangles;
+      std::unique_ptr<BVH<Triangle>> m_bvh;
 
     public:
       TriangleMesh(const std::vector<Triangle> &triangles,
@@ -24,12 +27,15 @@ namespace rt { namespace scene {
 
       class Triangle {
         private:
-          glm::dvec4 m_p0, m_p1, m_p2;
+          glm::dvec4 m_p[3];
         public:
           Triangle(const glm::dvec4 &p0, const glm::dvec4 &p1, const glm::dvec4 &p2);
           ~Triangle();
 
           double intersect(const Ray &ray, glm::dvec4 &normal) const;
+
+          AABB bbox() const;
+          glm::dvec4 centroid() const;
       };
   };
 

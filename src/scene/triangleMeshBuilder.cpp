@@ -99,7 +99,8 @@ namespace rt { namespace scene {
       }
       fprintf(stderr, "Adding mesh vertex: %g, %g, %g\n",
           vertex[0], vertex[1], vertex[2]);
-      vertex *= 10.0;  // XXX: Scale properly
+      vertex *= 10.0;
+      vertex[1] -= 2.0;
       m_vertices.push_back(vertex);
     } else if (m_tupleCount < m_vertexCount + m_faceCount) {
       // Read the vertex index data into triangles

@@ -16,10 +16,10 @@ namespace rt { namespace scene {
     double denominator = glm::dot(ray.direction(), normal);
 
     if (denominator == 0.0) {
-      return 0.0;  // Ray is parallel to the plane
+      return -DBL_MAX;  // Ray is parallel to the plane
     }
 
     double t = glm::dot(this->position() - ray.origin(), normal)  / denominator;
-    return t;
+    return std::max(t, 0.0);
   }
 } }
