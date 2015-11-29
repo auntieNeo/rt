@@ -16,7 +16,11 @@ namespace rt {
       glm::dvec4 direction() const { return m_direction; }
 
       glm::dvec4 point(double t) const { return this->origin() + t * this->direction(); }
+
+      Ray &operator*=(const glm::dmat4 &rhs);
   };
+
+  Ray operator*(const glm::dmat4 &lhs, const Ray &rhs);
 }
 
 #endif

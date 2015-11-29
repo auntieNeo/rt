@@ -99,8 +99,6 @@ namespace rt { namespace scene {
       }
       fprintf(stderr, "Adding mesh vertex: %g, %g, %g\n",
           vertex[0], vertex[1], vertex[2]);
-      vertex *= 10.0;
-      vertex[1] -= 2.0;
       m_vertices.push_back(vertex);
     } else if (m_tupleCount < m_vertexCount + m_faceCount) {
       // Read the vertex index data into triangles
@@ -142,7 +140,9 @@ namespace rt { namespace scene {
   }
 
   std::unique_ptr<TriangleMesh> TriangleMeshBuilder::build(const std::string &file,
-      MaterialPropertiesPtr material)
+      MaterialPropertiesPtr material,
+      const glm::dvec3 &scale,
+      const glm::dvec4 &position, const glm::dquat &orientation)
   {
     // Prepare the PLY scanner
     yyscan_t yyscanner;
@@ -171,7 +171,9 @@ namespace rt { namespace scene {
     fprintf(stderr, "m_triangles.size(): %d\n", m_triangles.size());
 
     // Construct the triangle mesh
-    std::unique_ptr<TriangleMesh> result(new TriangleMesh(m_triangles, material));
+    std::unique_ptr<TriangleMesh> result(
+        new TriangleMesh(m_triangles, material,
+          scale, position, orientation));
 
     return std::move(result);
   }

@@ -41,7 +41,11 @@ namespace rt { namespace scene {
       void vertexIndicesPropertyList(int isFloat);
       void tuple(const std::vector<Number> &value);
 
-      std::unique_ptr<TriangleMesh> build(const std::string &file, MaterialPropertiesPtr material);
+      std::unique_ptr<TriangleMesh> build(const std::string &file,
+          MaterialPropertiesPtr material,
+          const glm::dvec3 &scale = glm::dvec3(1.0, 1.0, 1.0),
+          const glm::dvec4 &position = glm::dvec4(0.0, 0.0, 0.0, 1.0),
+          const glm::dquat &orientation = glm::dquat());
   };
 } }
 

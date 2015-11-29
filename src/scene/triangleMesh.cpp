@@ -1,13 +1,16 @@
 #include <cstdio>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "triangleMesh.h"
 
 namespace rt { namespace scene {
   TriangleMesh::TriangleMesh(const std::vector<Triangle> &triangles,
       MaterialPropertiesPtr material,
+      const glm::dvec3 &scale,
       const glm::dvec4 &position, const glm::dquat &orientation)
     : DrawableObject(material, position, orientation),
-    m_triangles(triangles), m_bvh(nullptr)
+    m_triangles(triangles), m_scale(scale), m_bvh(nullptr)
   {
     m_bvh = std::unique_ptr<BVH<Triangle>>(new BVH<Triangle>(triangles));
   }
@@ -16,9 +19,20 @@ namespace rt { namespace scene {
   }
 
   double TriangleMesh::intersect(const Ray &ray, glm::dvec4 &normal) const {
-    double t = m_bvh->intersect(ray, normal);
+    // Transform the ray into object space
+    Ray objectRay =
+      glm::scale(glm::dmat4(1.0), 1.0 / m_scale) *
+      glm::mat4_cast(glm::inverse(this->orientation())) *
+      glm::translate(glm::dmat4(1.0), -glm::dvec3(this->position())) *
+      ray;
+    double t = m_bvh->intersect(objectRay, normal);
     if (t != DBL_MAX) {
-//      fprintf(stderr, "t: %g\n", t);
+      // TODO: Transform the normal back into world space
+      normal =
+        glm::normalize(
+          glm::mat4_cast(this->orientation()) *
+          glm::scale(glm::dmat4(1.0), m_scale) *
+          normal);
     }
     return t;
     /*

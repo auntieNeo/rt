@@ -67,6 +67,13 @@ int main(int argc, char **argv) {
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
         ));
+  rt::scene::MaterialPropertiesPtr whiteDiffuse(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.9, 0.9, 0.9),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0  // smoothness
+        ));
   rt::scene::MaterialPropertiesPtr mirrorMaterial(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
@@ -84,32 +91,40 @@ int main(int argc, char **argv) {
         glm::dvec3(0.0, 0.0, 0.0),  // mirror
         glm::dvec3(0.0, 0.0, 0.0),  // refraction
         4.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
-//        50.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+//        75.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
         ));
 
   // Load the bunny mesh
   rt::scene::TriangleMeshBuilder builder;
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
-    builder.build("../sandbox/bunny/reconstruction/bun_zipper_res4.ply", lightMaterial);
+    builder.build("../sandbox/bunny/reconstruction/bun_zipper_res4.ply",
+        greenDiffuse,
+        glm::dvec3(1.0, 1.0, 1.0) * 100.0,  // scale
+        glm::dvec4(3.0, -15.0, -17.0, 1.0)  // position
+        );
   /*
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
-    builder.build("../sandbox/test.ply", lightMaterial);
-    */
+    builder.build("../sandbox/test.ply", greenDiffuse,
+        glm::dvec3(1.0, 1.0, 1.0) * 5.0,  // scale
+        glm::dvec4(4.0, 1.0, 0.0, 1.0),  // position
+        glm::angleAxis(M_PI, glm::dvec3(0.0, 1.0, 0.0))
+        );
+        */
   scene.addObject(std::move(bunny));
 
-  /*
   for (int i = 0; i < NUM_SPHERES; ++i) {
+    if (i == 1)
+      continue;
     double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
     pos *= 5.0;
     std::unique_ptr<rt::scene::Sphere> sphere(
         new rt::scene::Sphere(
           4.0,  // radius
-          i == 1 ? lightMaterial : redMaterial,
+          i == 2 ? lightMaterial : blueDiffuse,
           glm::dvec4(pos, pos, -15.0 + pos, 1.0)  // position
           ));
     scene.addObject(std::move(sphere));
   }
-  */
 
   std::unique_ptr<rt::scene::Plane> backWall(
       new rt::scene::Plane(
@@ -119,19 +134,19 @@ int main(int argc, char **argv) {
   scene.addObject(std::move(backWall));
   std::unique_ptr<rt::scene::Plane> leftWall(
       new rt::scene::Plane(
-        blueDiffuse,
+        whiteDiffuse,
         glm::dvec4(-10.0, 0.0, 0.0, 1.0),  // position
         glm::angleAxis(0.0, glm::dvec3(1.0, 0.0, 0.0))));  // orientation
   scene.addObject(std::move(leftWall));
   std::unique_ptr<rt::scene::Plane> rightWall(
       new rt::scene::Plane(
-        blueDiffuse,
+        whiteDiffuse,
         glm::dvec4(10.0, 0.0, 0.0, 1.0),  // position
         glm::angleAxis(M_PI, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(rightWall));
   std::unique_ptr<rt::scene::Plane> ceiling(
       new rt::scene::Plane(
-        greenDiffuse,
+        blueDiffuse,
         glm::dvec4(0.0, 10.0, 0.0, 1.0),  // position
         glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(ceiling));
@@ -184,8 +199,8 @@ int main(int argc, char **argv) {
 //      rt::render::SimpleSampleDistribution,
       // Take samples in a poisson disk sample distribution at each pixel
       rt::render::PoissonDiskSampleDistribution,
-      // Halt after 10 passes
-      rt::render::PassCountHaltingStrategy<100>,
+      // Halt after 10000 passes
+      rt::render::PassCountHaltingStrategy<10000>,
       // Use 32-bit Mersenne Twister to generate pseudo random numbers
       std::mt19937
     >,

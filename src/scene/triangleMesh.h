@@ -15,10 +15,12 @@ namespace rt { namespace scene {
     private:
       std::vector<Triangle> m_triangles;
       std::unique_ptr<BVH<Triangle>> m_bvh;
+      glm::dvec3 m_scale;
 
     public:
       TriangleMesh(const std::vector<Triangle> &triangles,
           MaterialPropertiesPtr material,
+          const glm::dvec3 &scale = glm::dvec3(1.0, 1.0, 1.0),
           const glm::dvec4 &position = glm::dvec4(0.0, 0.0, 0.0, 1.0),
           const glm::dquat &orientation = glm::dquat());
       ~TriangleMesh();
