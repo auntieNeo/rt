@@ -70,6 +70,13 @@ int main(int argc, char **argv) {
   rt::scene::MaterialPropertiesPtr whiteDiffuse(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0xA7, 0x71, 0x43) / (255.0 * 1.5),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0  // smoothness
+        ));
+  rt::scene::MaterialPropertiesPtr clayMaterial(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
         glm::dvec3(0.9, 0.9, 0.9),  // diffuse
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
@@ -97,10 +104,10 @@ int main(int argc, char **argv) {
   // Load the bunny mesh
   rt::scene::TriangleMeshBuilder builder;
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
-    builder.build("../sandbox/bunny/reconstruction/bun_zipper_res4.ply",
-        greenDiffuse,
+    builder.build("../sandbox/bunny/reconstruction/bun_zipper.ply",
+        clayMaterial,
         glm::dvec3(1.0, 1.0, 1.0) * 100.0,  // scale
-        glm::dvec4(3.0, -15.0, -17.0, 1.0)  // position
+        glm::dvec4(2.5, -13.88023, -17.0, 1.0)  // position
         );
   /*
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
@@ -113,7 +120,7 @@ int main(int argc, char **argv) {
   scene.addObject(std::move(bunny));
 
   for (int i = 0; i < NUM_SPHERES; ++i) {
-    if (i == 1)
+    if (i != 2)
       continue;
     double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
     pos *= 5.0;
@@ -128,7 +135,7 @@ int main(int argc, char **argv) {
 
   std::unique_ptr<rt::scene::Plane> backWall(
       new rt::scene::Plane(
-        redDiffuse,
+        whiteDiffuse,
         glm::dvec4(0.0, 0.0, -20.0, 1.0),  // position
         glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 1.0, 0.0))));  // orientation
   scene.addObject(std::move(backWall));
@@ -146,7 +153,7 @@ int main(int argc, char **argv) {
   scene.addObject(std::move(rightWall));
   std::unique_ptr<rt::scene::Plane> ceiling(
       new rt::scene::Plane(
-        blueDiffuse,
+        whiteDiffuse,
         glm::dvec4(0.0, 10.0, 0.0, 1.0),  // position
         glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(ceiling));

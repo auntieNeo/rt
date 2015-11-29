@@ -53,7 +53,7 @@ VERSION_STRING ([[:digit:]]+".")*[[:digit:]]
   return INTEGER_TOKEN;
 }
 
-"-"?[[:digit:]]+"."[[:digit:]]* {
+"-"?[[:digit:]]+"."[[:digit:]]*("e""-"?[[:digit:]]+)? {
   try {
     yylval->floatingPoint = std::stod(yytext);
   } catch (...) {

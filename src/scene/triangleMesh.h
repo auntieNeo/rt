@@ -16,6 +16,7 @@ namespace rt { namespace scene {
       std::vector<Triangle> m_triangles;
       std::unique_ptr<BVH<Triangle>> m_bvh;
       glm::dvec3 m_scale;
+      glm::dmat4 m_worldModelMatrix, m_normalMatrix;
 
     public:
       TriangleMesh(const std::vector<Triangle> &triangles,

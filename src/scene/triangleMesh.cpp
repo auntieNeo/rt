@@ -1,5 +1,6 @@
 #include <cstdio>
 
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "triangleMesh.h"
@@ -13,26 +14,27 @@ namespace rt { namespace scene {
     m_triangles(triangles), m_scale(scale), m_bvh(nullptr)
   {
     m_bvh = std::unique_ptr<BVH<Triangle>>(new BVH<Triangle>(triangles));
+
+    m_worldModelMatrix = 
+      glm::scale(glm::dmat4(1.0), 1.0 / m_scale) *
+      glm::mat4_cast(glm::inverse(this->orientation())) *
+      glm::translate(glm::dmat4(1.0), -glm::dvec3(this->position()));
+    m_normalMatrix =
+      glm::inverseTranspose(
+          glm::mat4_cast(this->orientation()) *
+          glm::scale(glm::dmat4(1.0), m_scale));
   }
 
   TriangleMesh::~TriangleMesh() {
   }
 
   double TriangleMesh::intersect(const Ray &ray, glm::dvec4 &normal) const {
-    // Transform the ray into object space
-    Ray objectRay =
-      glm::scale(glm::dmat4(1.0), 1.0 / m_scale) *
-      glm::mat4_cast(glm::inverse(this->orientation())) *
-      glm::translate(glm::dmat4(1.0), -glm::dvec3(this->position())) *
-      ray;
+    // Transform the ray into model space
+    Ray objectRay = m_worldModelMatrix * ray;
     double t = m_bvh->intersect(objectRay, normal);
     if (t != DBL_MAX) {
       // TODO: Transform the normal back into world space
-      normal =
-        glm::normalize(
-          glm::mat4_cast(this->orientation()) *
-          glm::scale(glm::dmat4(1.0), m_scale) *
-          normal);
+      normal = glm::normalize(m_normalMatrix * normal);
     }
     return t;
     /*
