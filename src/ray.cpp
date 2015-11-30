@@ -11,7 +11,7 @@ namespace rt {
 
   Ray &Ray::operator*=(const glm::dmat4 &rhs) {
     m_origin = rhs * m_origin;
-    m_direction = rhs * m_direction;
+    m_direction = glm::normalize(rhs * m_direction);
     return *this;
   }
 

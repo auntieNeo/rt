@@ -58,9 +58,9 @@ namespace rt { namespace render {
 
     glm::dvec3 result(0.0, 0.0, 0.0);
 
-    // Get the point just outside the surface to avoid self-shadows
+    // Get the point just inside/outside the volume to avoid self-shadows
+    glm::dvec4 insidePoint = ray.point(t) - math::EPSILON * normal;
     glm::dvec4 outsidePoint = ray.point(t) + math::EPSILON * normal;
-    // TODO: I will probably need an insidePoint in some circumstances
 
     // Make a tangent basis
     glm::dvec4 w = glm::dot(normal, ray.direction()) < 0.0 ? normal : -normal;
@@ -93,6 +93,35 @@ namespace rt { namespace render {
       Ray reflectedRay(outsidePoint, reflectedDirection);
       return object->material()->emission() +
         object->material()->diffuse() * m_trace(reflectedRay, scene, randomEngine, depth);
+    } else if (object->material()->isMirror()) {
+      // Reflect the ray as in a perfect mirror
+      Ray reflectedRay = Ray(
+          outsidePoint,
+          glm::normalize(glm::reflect(ray.direction(), normal)));
+      return object->material()->emission() +
+        object->material()->mirror() * m_trace(reflectedRay, scene, randomEngine, depth);
+    } else if (object->material()->isRefraction()) {
+      bool into = glm::dot(normal, ray.direction()) < 0.0;  // Is the ray entering or leaving the volume?
+      // Index of refraction (assuming that we are rendering in a vacuum with
+      // an index of refraction of 1.0)
+      double n = into ? 1.0 / object->material()->refractiveIndex()
+                       : object->material()->refractiveIndex();
+      double cosTheta = glm::dot(ray.direction(), normal);
+      double discriminant = 1.0 - (n*n * (1.0 - cosTheta*cosTheta));
+      if (discriminant < 0.0) {
+        // Total internal reflection
+        Ray reflectedRay(
+            insidePoint,
+            glm::normalize(glm::reflect(ray.direction(), -normal)));
+        return object->material()->emission() +
+          object->material()->refraction() * m_trace(reflectedRay, scene, randomEngine, depth);
+      }
+      // Compute the refracted ray
+      glm::dvec4 refractionDirection = glm::normalize(n * (ray.direction() + cosTheta * normal) - normal * sqrt(discriminant));
+      Ray refractedRay(into ? insidePoint : outsidePoint, refractionDirection);
+      // TODO: Implement Beer's law
+      return object->material()->emission() +
+        object->material()->refraction() * m_trace(refractedRay, scene, randomEngine, depth);
     }
 
     return object->material()->emission();

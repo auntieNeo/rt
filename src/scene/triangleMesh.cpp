@@ -55,11 +55,15 @@ namespace rt { namespace scene {
   }
 
   TriangleMesh::Triangle::Triangle(
-      const glm::dvec4 &p0, const glm::dvec4 &p1, const glm::dvec4 &p2)
+      const glm::dvec4 &p0, const glm::dvec4 &p1, const glm::dvec4 &p2,
+      const glm::dvec4 &n0, const glm::dvec4 &n1, const glm::dvec4 &n2)
   {
     m_p[0] = p0;
     m_p[1] = p1;
     m_p[2] = p2;
+    m_n[0] = n0;
+    m_n[1] = n1;
+    m_n[2] = n2;
   }
 
   TriangleMesh::Triangle::~Triangle() {
@@ -100,7 +104,7 @@ namespace rt { namespace scene {
     // TODO: Compute the normal from the vertex normals weighted by the
     // barycentric coordinates
 
-    normal = glm::dvec4(n, 0.0);  // NOTE: this is a normal for flat shading
+    normal = (1.0 - w[0] - w[1])*m_n[0] + w[0]*m_n[1] + w[1]*m_n[2];
 
     return t;
   }

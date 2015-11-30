@@ -103,27 +103,20 @@ namespace rt { namespace scene {
     } else if (m_tupleCount < m_vertexCount + m_faceCount) {
       // Read the vertex index data into triangles
       assert(m_faceProperties.size() == 1);  // Only vertex_indices supported
-      glm::dvec4 p0(0.0, 0.0, 0.0, 1.0),
-        p1(0.0, 0.0, 0.0, 1.0), p2(0.0, 0.0, 0.0, 1.0);
+      size_t p0 = -1, p1 = -1, p2 = -1;
       for (size_t i = 0; i < value.size(); ++i) {
         switch (m_faceProperties[i]) {
           case PropertyType::VERTEX_INDICES:
             for (size_t j = i+1; j-(i+1) < value.at(i).i; ++j) {
               switch (j-(i+1)) {
                 case 0:
-                  p0 = m_vertices.at(value.at(j).i);
-                  fprintf(stderr, "p0: %g, %g, %g\n",
-                      p0[0], p0[1], p0[2]);
+                  p0 = value.at(j).i;
                   break;
                 case 1:
-                  p1 = m_vertices.at(value.at(j).i);
-                  fprintf(stderr, "p1: %g, %g, %g\n",
-                      p1[0], p1[1], p1[2]);
+                  p1 = value.at(j).i;
                   break;
                 case 2:
-                  p2 = m_vertices.at(value.at(j).i);
-                  fprintf(stderr, "p2: %g, %g, %g\n",
-                      p2[0], p2[1], p2[2]);
+                  p2 = value.at(j).i;
                   break;
               }
             }
@@ -134,7 +127,14 @@ namespace rt { namespace scene {
             assert(false);
         }
       }
-      m_triangles.push_back(TriangleMesh::Triangle(p0, p1, p2));
+      assert(p0 != -1);
+      assert(p1 != -1);
+      assert(p2 != -1);
+      std::vector<size_t> face = {p0, p1, p2};
+      m_faces.push_back(face);
+      for (size_t v : face) {
+        m_vertexFaces[v].push_back(m_faces.size() - 1);
+      }
     }
     m_tupleCount += 1;
   }
@@ -164,6 +164,15 @@ namespace rt { namespace scene {
     // Clean up
     yylex_destroy(yyscanner);
 
+    // TODO: Construct a tringle for each face
+    for (std::vector<size_t> f : m_faces) {
+      m_triangles.push_back(
+          TriangleMesh::Triangle(
+            m_vertices.at(f[0]), m_vertices.at(f[1]), m_vertices.at(f[2]),
+            m_computeNormal(f[0]),
+            m_computeNormal(f[1]),
+            m_computeNormal(f[2])));
+    }
     // TODO: Compute each vertex normal as the average of adjacent face normals
 
     // TODO: Look for all triangles that share this vertex
@@ -176,5 +185,29 @@ namespace rt { namespace scene {
           scale, position, orientation));
 
     return std::move(result);
+  }
+
+  glm::dvec4 TriangleMeshBuilder::m_computeNormal(size_t v) {
+    glm::dvec4 result(0.0, 0.0, 0.0, 0.0);
+    size_t count = 0;
+    for (size_t f : m_vertexFaces.at(v)) {
+      result += m_faceNormal(f);
+      count += 1;
+    }
+    assert(count > 0);
+    assert(result[3] == 0.0);
+    result /= double(count);
+    return result;
+  }
+
+  glm::dvec4 TriangleMeshBuilder::m_faceNormal(size_t f) {
+    assert(m_faces[f].size() == 3);
+    return
+      glm::dvec4(
+          glm::normalize(
+            glm::cross(
+              glm::dvec3(m_vertices[m_faces[f][1]] - m_vertices[m_faces[f][0]]),
+              glm::dvec3(m_vertices[m_faces[f][2]] - m_vertices[m_faces[f][0]]))),
+          0.0);
   }
 } }

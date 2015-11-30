@@ -31,8 +31,10 @@ namespace rt { namespace scene {
       class Triangle {
         private:
           glm::dvec4 m_p[3];
+          glm::dvec4 m_n[3];
         public:
-          Triangle(const glm::dvec4 &p0, const glm::dvec4 &p1, const glm::dvec4 &p2);
+          Triangle(const glm::dvec4 &p0, const glm::dvec4 &p1, const glm::dvec4 &p2,
+                   const glm::dvec4 &n0, const glm::dvec4 &n1, const glm::dvec4 &n2);
           ~Triangle();
 
           double intersect(const Ray &ray, glm::dvec4 &normal) const;

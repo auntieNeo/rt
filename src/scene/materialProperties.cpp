@@ -7,10 +7,10 @@ namespace rt { namespace scene {
       const glm::dvec3 &ambient, const glm::dvec3 &diffuse,
       const glm::dvec3 &specular, double smoothness,
       const glm::dvec3 &mirror, const glm::dvec3 &refraction,
-      const glm::dvec3 &emission)
+      const glm::dvec3 &emission, double refractiveIndex)
     : m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
     m_smoothness(smoothness), m_mirror(mirror), m_refraction(refraction),
-    m_emission(emission)
+    m_emission(emission), m_refractiveIndex(refractiveIndex)
   {
     // Normalized diffuse and specular factors that more faithfully approximate
     // the underlying BRDF. See Real-Time Rendering, Third Edition, Akenine,

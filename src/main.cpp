@@ -49,35 +49,35 @@ int main(int argc, char **argv) {
   rt::scene::MaterialPropertiesPtr redDiffuse(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
-        glm::dvec3(0.9, 0.1, 0.1),  // diffuse
+        glm::dvec3(0.75, 0.25, 0.25),  // diffuse
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
         ));
   rt::scene::MaterialPropertiesPtr greenDiffuse(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
-        glm::dvec3(0.1, 0.9, 0.1),  // diffuse
+        glm::dvec3(0.25, 0.75, 0.25),  // diffuse
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
         ));
   rt::scene::MaterialPropertiesPtr blueDiffuse(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
-        glm::dvec3(0.1, 0.1, 0.9),  // diffuse
+        glm::dvec3(0.25, 0.25, 0.75),  // diffuse
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
         ));
   rt::scene::MaterialPropertiesPtr whiteDiffuse(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
-        glm::dvec3(0xA7, 0x71, 0x43) / (255.0 * 1.5),  // diffuse
+        glm::dvec3(0.75, 0.75, 0.75),  // diffuse
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
         ));
   rt::scene::MaterialPropertiesPtr clayMaterial(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
-        glm::dvec3(0.9, 0.9, 0.9),  // diffuse
+        glm::dvec3(0xA7, 0x71, 0x43) / (255.0 * 1.5),  // diffuse
         glm::dvec3(0.0, 0.0, 0.0),  // specular
         0.0  // smoothness
         ));
@@ -89,6 +89,17 @@ int main(int argc, char **argv) {
         0.0,  // smoothness
         glm::dvec3(1.0, 1.0, 1.0)  // mirror
         ));
+  rt::scene::MaterialPropertiesPtr glassMaterial(
+      new rt::scene::MaterialProperties(
+        glm::dvec3(0.0, 0.0, 0.0),  // ambient
+        glm::dvec3(0.0, 0.0, 0.0),  // diffuse
+        glm::dvec3(0.0, 0.0, 0.0),  // specular
+        0.0,  // smoothness
+        glm::dvec3(0.0, 0.0, 0.0),  // mirror
+        glm::dvec3(1.0, 1.0, 1.0),  // refraction
+        glm::dvec3(0.0, 0.0, 0.0),  // emission
+        1.5  // refractive index
+        ));
   rt::scene::MaterialPropertiesPtr lightMaterial(
       new rt::scene::MaterialProperties(
         glm::dvec3(0.0, 0.0, 0.0),  // ambient
@@ -97,57 +108,53 @@ int main(int argc, char **argv) {
         0.0,  // smoothness
         glm::dvec3(0.0, 0.0, 0.0),  // mirror
         glm::dvec3(0.0, 0.0, 0.0),  // refraction
-        4.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
+        6.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
 //        75.0 * glm::dvec3(1.0, 1.0, 1.0)  // emission
         ));
 
   // Load the bunny mesh
   rt::scene::TriangleMeshBuilder builder;
+  /*
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
     builder.build("../sandbox/bunny/reconstruction/bun_zipper.ply",
-        clayMaterial,
+        whiteDiffuse,
         glm::dvec3(1.0, 1.0, 1.0) * 100.0,  // scale
         glm::dvec4(2.5, -13.88023, -17.0, 1.0)  // position
         );
-  /*
-  std::unique_ptr<rt::scene::TriangleMesh> bunny =
-    builder.build("../sandbox/test.ply", greenDiffuse,
-        glm::dvec3(1.0, 1.0, 1.0) * 5.0,  // scale
-        glm::dvec4(4.0, 1.0, 0.0, 1.0),  // position
-        glm::angleAxis(M_PI, glm::dvec3(0.0, 1.0, 0.0))
-        );
-        */
   scene.addObject(std::move(bunny));
+        */
+  // Load the Happy Buddha mesh
+  std::unique_ptr<rt::scene::TriangleMesh> happy =
+    builder.build("../sandbox/happy_recon/happy_vrip.ply",
+        glassMaterial,
+        glm::dvec3(1.0, 1.0, 1.0) * 80.0,  // scale
+        glm::dvec4(0.5, -0.05 * 80.0 - 10.0, -15.0, 1.0)  // position
+        );
+  scene.addObject(std::move(happy));
 
-  for (int i = 0; i < NUM_SPHERES; ++i) {
-    if (i != 2)
-      continue;
-    double pos = (double(i) / double(NUM_SPHERES - 1)) * 2.0 - 1.0;
-    pos *= 5.0;
-    std::unique_ptr<rt::scene::Sphere> sphere(
-        new rt::scene::Sphere(
-          4.0,  // radius
-          i == 2 ? lightMaterial : blueDiffuse,
-          glm::dvec4(pos, pos, -15.0 + pos, 1.0)  // position
-          ));
-    scene.addObject(std::move(sphere));
-  }
+  std::unique_ptr<rt::scene::Sphere> sphereLight(
+      new rt::scene::Sphere(
+        4.0,  // radius
+        lightMaterial,
+        glm::dvec4(5.0, 5.0, 3.0, 1.0)  // position
+        ));
+  scene.addObject(std::move(sphereLight));
 
   std::unique_ptr<rt::scene::Plane> backWall(
       new rt::scene::Plane(
         whiteDiffuse,
-        glm::dvec4(0.0, 0.0, -20.0, 1.0),  // position
+        glm::dvec4(0.0, 0.0, -24.0, 1.0),  // position
         glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 1.0, 0.0))));  // orientation
   scene.addObject(std::move(backWall));
   std::unique_ptr<rt::scene::Plane> leftWall(
       new rt::scene::Plane(
-        whiteDiffuse,
+        redDiffuse,
         glm::dvec4(-10.0, 0.0, 0.0, 1.0),  // position
         glm::angleAxis(0.0, glm::dvec3(1.0, 0.0, 0.0))));  // orientation
   scene.addObject(std::move(leftWall));
   std::unique_ptr<rt::scene::Plane> rightWall(
       new rt::scene::Plane(
-        whiteDiffuse,
+        greenDiffuse,
         glm::dvec4(10.0, 0.0, 0.0, 1.0),  // position
         glm::angleAxis(M_PI, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(rightWall));
@@ -159,7 +166,7 @@ int main(int argc, char **argv) {
   scene.addObject(std::move(ceiling));
   std::unique_ptr<rt::scene::Plane> floor(
       new rt::scene::Plane(
-        greenDiffuse,
+        whiteDiffuse,
         glm::dvec4(0.0, -10.0, 0.0, 1.0),  // position
         glm::angleAxis(M_PI / 2.0, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(floor));

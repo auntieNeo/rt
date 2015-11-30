@@ -3,13 +3,13 @@
 #include "simpleRayTracer.h"
 
 namespace rt { namespace render {
-  glm::dvec3 SimpleRayTracer::computeRadiance(
+  glm::dvec3 SimpleRayTracerBase::computeRadiance(
       const Ray &ray, const scene::Scene &scene)
   {
     return m_trace(ray, scene, 0);
   }
 
-  glm::dvec3 SimpleRayTracer::m_trace(
+  glm::dvec3 SimpleRayTracerBase::m_trace(
       const Ray &ray, const scene::Scene &scene, int depth)
   {
     if (++depth > MAX_DEPTH)
@@ -70,7 +70,7 @@ namespace rt { namespace render {
     return result;
   }
 
-  glm::dvec3 SimpleRayTracer::shading(const Ray &ray, double t, double r,
+  glm::dvec3 SimpleRayTracerBase::shading(const Ray &ray, double t, double r,
       const glm::dvec4 &normal, scene::PointLight &pointLight,
       const scene::MaterialProperties &material)
   {
