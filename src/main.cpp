@@ -114,7 +114,6 @@ int main(int argc, char **argv) {
 
   // Load the bunny mesh
   rt::scene::TriangleMeshBuilder builder;
-  /*
   std::unique_ptr<rt::scene::TriangleMesh> bunny =
     builder.build("../sandbox/bunny/reconstruction/bun_zipper.ply",
         whiteDiffuse,
@@ -122,15 +121,16 @@ int main(int argc, char **argv) {
         glm::dvec4(2.5, -13.88023, -17.0, 1.0)  // position
         );
   scene.addObject(std::move(bunny));
-        */
   // Load the Happy Buddha mesh
+  /*
   std::unique_ptr<rt::scene::TriangleMesh> happy =
-    builder.build("../sandbox/happy_recon/happy_vrip.ply",
+    builder.build("../sandbox/happy_recon/happy_vrip_res4.ply",
         glassMaterial,
         glm::dvec3(1.0, 1.0, 1.0) * 80.0,  // scale
         glm::dvec4(0.5, -0.05 * 80.0 - 10.0, -15.0, 1.0)  // position
         );
   scene.addObject(std::move(happy));
+  */
 
   std::unique_ptr<rt::scene::Sphere> sphereLight(
       new rt::scene::Sphere(
@@ -142,31 +142,31 @@ int main(int argc, char **argv) {
 
   std::unique_ptr<rt::scene::Plane> backWall(
       new rt::scene::Plane(
-        whiteDiffuse,
+        clayMaterial,
         glm::dvec4(0.0, 0.0, -24.0, 1.0),  // position
         glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 1.0, 0.0))));  // orientation
   scene.addObject(std::move(backWall));
   std::unique_ptr<rt::scene::Plane> leftWall(
       new rt::scene::Plane(
-        redDiffuse,
+        clayMaterial,
         glm::dvec4(-10.0, 0.0, 0.0, 1.0),  // position
         glm::angleAxis(0.0, glm::dvec3(1.0, 0.0, 0.0))));  // orientation
   scene.addObject(std::move(leftWall));
   std::unique_ptr<rt::scene::Plane> rightWall(
       new rt::scene::Plane(
-        greenDiffuse,
+        clayMaterial,
         glm::dvec4(10.0, 0.0, 0.0, 1.0),  // position
         glm::angleAxis(M_PI, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(rightWall));
   std::unique_ptr<rt::scene::Plane> ceiling(
       new rt::scene::Plane(
-        whiteDiffuse,
+        clayMaterial,
         glm::dvec4(0.0, 10.0, 0.0, 1.0),  // position
         glm::angleAxis(-M_PI / 2.0, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(ceiling));
   std::unique_ptr<rt::scene::Plane> floor(
       new rt::scene::Plane(
-        whiteDiffuse,
+        greenDiffuse,
         glm::dvec4(0.0, -10.0, 0.0, 1.0),  // position
         glm::angleAxis(M_PI / 2.0, glm::dvec3(0.0, 0.0, 1.0))));  // orientation
   scene.addObject(std::move(floor));
